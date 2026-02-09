@@ -67,7 +67,6 @@
   .app-container { max-width: 440px; margin: 0 auto; min-height: 100vh; position: relative; }
   .app-container.admin { max-width: 820px; }
 
-  /* Buttons */
   .btn {
     border: none; cursor: pointer; border-radius: 14px; font-weight: 700;
     font-size: 15px; padding: 16px; width: 100%; display: flex;
@@ -83,13 +82,11 @@
     display: flex; align-items: center; justify-content: center; background: rgba(0,229,255,0.08);
   }
 
-  /* Cards */
   .card {
     background: var(--card-bg); border-radius: 16px; padding: 18px;
     border: 1px solid rgba(0,229,255,0.06); margin-bottom: 12px;
   }
 
-  /* Status Badge */
   .badge {
     padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
     display: inline-flex; align-items: center; gap: 4px;
@@ -111,8 +108,6 @@
   .badge-cancelled::before { background: var(--danger); }
   .badge-pending { background: rgba(255,214,0,0.13); color: var(--warning); }
   .badge-pending::before { background: var(--warning); }
-
-  /* Stat Card */
   .stat-card {
     background: var(--card-bg); border-radius: 16px; padding: 20px 22px;
     position: relative; overflow: hidden;
@@ -129,7 +124,6 @@
   .stat-card .stat-sub { font-size: 12px; color: var(--gray); margin-top: 4px; }
   .stat-card .stat-trend { font-size: 11px; margin-top: 4px; font-weight: 600; }
 
-  /* Map Simulation */
   .sim-map {
     background: #0a1628; border-radius: 16px; position: relative;
     overflow: hidden; border: 1px solid rgba(0,229,255,0.06);
@@ -166,17 +160,16 @@
     font-size: 16px;
   }
 
-  /* Grid layouts */
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   .flex-center { display: flex; align-items: center; justify-content: center; }
   .flex-between { display: flex; align-items: center; justify-content: space-between; }
 
-  /* Progress Bar */
+
   .progress-bar { height: 6px; background: var(--card-bg2); border-radius: 3px; overflow: hidden; }
   .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
 
-  /* Input */
+ 
   .input-field {
     width: 100%; padding: 10px 14px; background: var(--card-bg2);
     border: 1px solid rgba(0,229,255,0.08); border-radius: 10px;
@@ -185,7 +178,7 @@
   .input-field::placeholder { color: var(--gray); }
   .input-field:focus { border-color: rgba(0,229,255,0.3); }
 
-  /* Side menu overlay */
+
   .menu-overlay {
     position: fixed; inset: 0; z-index: 100; display: flex;
   }
@@ -201,7 +194,7 @@
     border-bottom: 1px solid rgba(136,146,176,0.08); color: var(--gray-light); font-size: 14px;
   }
 
-  /* Dropdown suggestions */
+ 
   .suggestions {
     position: absolute; top: 100%; left: 0; right: 0;
     background: var(--card-bg2); border-radius: 0 0 10px 10px;
@@ -215,7 +208,6 @@
   }
   .suggestion-item:hover { background: rgba(0,229,255,0.05); }
 
-  /* Vehicle option */
   .vehicle-option {
     width: 100%; display: flex; align-items: center; gap: 14px;
     padding: 14px; margin-bottom: 8px; border-radius: 14px; cursor: pointer;
@@ -227,11 +219,11 @@
   }
   .vehicle-option:hover { border-color: rgba(0,229,255,0.3); }
 
-  /* Stars */
+ 
   .star-btn { background: none; border: none; cursor: pointer; transition: transform 0.2s; padding: 2px; }
   .star-btn.active { transform: scale(1.2); }
 
-  /* Tab buttons */
+ 
   .tab-btn {
     display: flex; align-items: center; gap: 6px; padding: 8px 14px;
     border-radius: 10px; border: none; cursor: pointer; white-space: nowrap;
@@ -240,13 +232,13 @@
   }
   .tab-btn.active { background: rgba(0,229,255,0.1); color: var(--cyan); font-weight: 600; }
 
-  /* Admin ride card */
+
   .ride-card {
     background: var(--card-bg); border-radius: 14px; padding: 14px;
     margin-bottom: 10px; border: 1px solid rgba(0,229,255,0.04);
   }
 
-  /* Driver list item */
+ 
   .driver-item {
     width: 100%; display: flex; align-items: center; gap: 12px;
     padding: 14px; margin-bottom: 8px; border-radius: 14px; cursor: pointer;
@@ -255,7 +247,7 @@
   }
   .driver-item:hover { border-color: rgba(0,229,255,0.2); }
 
-  /* Payment option */
+
   .pay-opt {
     flex: 1; padding: 8px 0; border-radius: 10px; cursor: pointer;
     font-size: 12px; color: var(--white); text-align: center;
@@ -264,7 +256,7 @@
   }
   .pay-opt.active { background: rgba(0,229,255,0.08); border: 2px solid var(--cyan); }
 
-  /* Filter button */
+  
   .filter-btn {
     padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 11px;
     text-transform: capitalize; background: transparent;
@@ -273,7 +265,7 @@
   }
   .filter-btn.active { background: rgba(0,229,255,0.1); color: var(--cyan); }
 
-  /* Surge button */
+  
   .surge-btn {
     flex: 1; padding: 10px 0; border-radius: 10px; cursor: pointer;
     font-size: 13px; font-weight: 600;
@@ -282,7 +274,7 @@
   }
   .surge-btn.active { background: rgba(255,214,0,0.12); border: 2px solid var(--warning); color: var(--warning); }
 
-  /* Landing */
+ 
   .landing {
     min-height: 100vh; display: flex; flex-direction: column;
     align-items: center; justify-content: center; padding: 24px;
@@ -304,7 +296,7 @@
   }
   .landing-card:hover { transform: translateX(4px); }
 
-  /* Switch App btn */
+  
   .switch-btn {
     position: fixed; top: 12px; left: 12px; z-index: 90;
     background: rgba(14,20,56,0.9); backdrop-filter: blur(10px);
@@ -315,13 +307,13 @@
 
   .hidden { display: none !important; }
 
-  /* Chart container */
+
   .chart-container { position: relative; width: 100%; }
 </style>
 </head>
 <body>
 
-<!-- ============ LANDING PAGE ============ -->
+
 <div id="landing" class="landing">
   <div class="bg-orb1"></div>
   <div class="bg-orb2"></div>
@@ -341,50 +333,50 @@
 
   <div style="display:flex;flex-direction:column;width:100%;max-width:340px;">
     <div class="landing-card" onclick="openApp('rider')" style="animation:fadeUp 0.5s ease 0s both;border-color:rgba(0,229,255,0.12);">
-      <span style="font-size:32px;">🧑‍💼</span>
+      <span style="font-size:32px;"></span>
       <div style="flex:1;"><div style="font-weight:700;font-size:16px;">Rider App</div><div style="color:var(--gray);font-size:12px;">Book rides across Delhi</div></div>
       <span style="color:var(--cyan);font-size:20px;">›</span>
     </div>
     <div class="landing-card" onclick="openApp('driver')" style="animation:fadeUp 0.5s ease 0.15s both;border-color:rgba(0,230,118,0.12);">
-      <span style="font-size:32px;">🚗</span>
+      <span style="font-size:32px;"></span>
       <div style="flex:1;"><div style="font-weight:700;font-size:16px;">Driver App</div><div style="color:var(--gray);font-size:12px;">Accept rides & earn money</div></div>
       <span style="color:var(--success);font-size:20px;">›</span>
     </div>
     <div class="landing-card" onclick="openApp('admin')" style="animation:fadeUp 0.5s ease 0.3s both;border-color:rgba(255,23,68,0.12);">
-      <span style="font-size:32px;">🛡️</span>
+      <span style="font-size:32px;"></span>
       <div style="flex:1;"><div style="font-weight:700;font-size:16px;">Admin Dashboard</div><div style="color:var(--gray);font-size:12px;">Manage everything</div></div>
       <span style="color:var(--danger);font-size:20px;">›</span>
     </div>
   </div>
 
   <div style="margin-top:48px;display:flex;gap:20px;color:var(--gray);font-size:11px;">
-    <span>🏙️ Delhi NCR</span><span>🔒 Secure</span><span>⚡ Real-time</span>
+    <span> Delhi NCR</span><span> Secure</span><span></span> Real-time</span>
   </div>
 </div>
 
-<!-- ============ RIDER APP ============ -->
+
 <div id="rider-app" class="app-container hidden">
   <button class="switch-btn" onclick="openApp('landing')">← Switch App</button>
 
-  <!-- Side Menu -->
+ 
   <div id="rider-menu" class="menu-overlay hidden">
     <div class="menu-backdrop" onclick="toggleMenu(false)"></div>
     <div class="menu-panel">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:30px;">
         <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:20px;">👤</div>
-        <div><div style="font-weight:600;font-size:15px;">Debarghya</div><div style="color:var(--gray);font-size:12px;">+91 99999 99999</div></div>
+        <div><div style="font-weight:600;font-size:15px;">ANEEK</div><div style="color:var(--gray);font-size:12px;">+91 99999 99999</div></div>
       </div>
-      <button class="menu-item" onclick="riderGo('home');toggleMenu(false);">🏠 &nbsp; Home</button>
-      <button class="menu-item" onclick="showRideHistory();toggleMenu(false);">🕐 &nbsp; Ride History</button>
-      <button class="menu-item">💰 &nbsp; Wallet: ₹2,450</button>
-      <button class="menu-item">💳 &nbsp; Payment Methods</button>
-      <button class="menu-item">🏆 &nbsp; Rewards</button>
-      <button class="menu-item">⚙️ &nbsp; Settings</button>
-      <button class="menu-item">🛡️ &nbsp; Safety</button>
+      <button class="menu-item" onclick="riderGo('home');toggleMenu(false);"> &nbsp; Home</button>
+      <button class="menu-item" onclick="showRideHistory();toggleMenu(false);"> &nbsp; Ride History</button>
+      <button class="menu-item"> &nbsp; Wallet: ₹2,450</button>
+      <button class="menu-item"> &nbsp; Payment Methods</button>
+      <button class="menu-item"> &nbsp; Rewards</button>
+      <button class="menu-item"> &nbsp; Settings</button>
+      <button class="menu-item"> &nbsp; Safety</button>
     </div>
   </div>
 
-  <!-- Header -->
+ 
   <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
     <button class="btn-icon" onclick="toggleMenu(true)">☰</button>
     <div style="display:flex;align-items:center;gap:8px;">
@@ -393,22 +385,22 @@
       </div>
       <span style="font-size:16px;font-weight:800;letter-spacing:2px;">MOVEO</span>
     </div>
-    <button class="btn-icon" style="position:relative;">🔔<span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--danger);"></span></button>
+    <button class="btn-icon" style="position:relative;"><span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--danger);"></span></button>
   </div>
 
   <div style="padding:0 20px 20px;" id="rider-content"></div>
 </div>
 
-<!-- ============ DRIVER APP ============ -->
+
 <div id="driver-app" class="app-container hidden">
   <button class="switch-btn" onclick="openApp('landing')">← Switch App</button>
   <div style="padding:20px;" id="driver-content"></div>
 </div>
 
-<!-- ============ ADMIN DASHBOARD ============ -->
+
 <div id="admin-app" class="app-container admin hidden">
   <button class="switch-btn" onclick="openApp('landing')">← Switch App</button>
-  <!-- Header -->
+
   <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,229,255,0.06);">
     <div style="display:flex;align-items:center;gap:8px;">
       <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;">
@@ -421,13 +413,13 @@
       <div style="width:34px;height:34px;border-radius:8px;background:rgba(255,23,68,0.12);display:flex;align-items:center;justify-content:center;">🛡️</div>
     </div>
   </div>
-  <!-- Tabs -->
+  
   <div style="display:flex;gap:2px;padding:10px 16px;overflow-x:auto;" id="admin-tabs"></div>
   <div style="padding:12px 16px;" id="admin-content"></div>
 </div>
 
 <script>
-// ============ DATA ============
+=
 const VEHICLES = [
   { id:"bike", name:"Bike", icon:"🏍️", rate:7, base:25, eta:"2 min", desc:"Quick & affordable" },
   { id:"mini", name:"Mini", icon:"🚗", rate:12, base:40, eta:"4 min", desc:"Compact sedan" },
@@ -470,7 +462,7 @@ const revenueData = {
   rides: [320,380,350,420,510,580,460],
 };
 
-// ============ STATE ============
+
 let state = {
   rider: { step:"home", pickup:"", drop:"", selectedVehicle:null, driverPos:0, rating:0, payment:"cash" },
   driver: { step:"home", isOnline:false, timer:15, tripProgress:0 },
@@ -479,7 +471,7 @@ let state = {
 
 let intervals = {};
 
-// ============ HELPERS ============
+
 function badge(status) {
   const map = { online:"Online", offline:"Offline", on_ride:"On Ride", completed:"Completed", in_progress:"In Progress", cancelled:"Cancelled", pending:"Pending" };
   const cls = status.replace("_","");
@@ -510,7 +502,7 @@ function mapHTML(h=280, pickup=null, drop=null, showDriver=false, driverPos=30) 
     <div class="road-v" style="left:70%;width:2px;"></div>
     <svg style="position:absolute;inset:0;width:100%;height:100%;"><path d="M 80 ${h*0.64} Q 150 ${h*0.36} 200 ${h*0.43} T 320 ${h*0.29}" stroke="var(--cyan)" stroke-width="3" fill="none" stroke-dasharray="8 4" opacity="0.6"/></svg>
     ${markers}
-    <div class="map-label">🗺️ Delhi NCR — Live Map</div>
+    <div class="map-label"> Delhi NCR — Live Map</div>
   </div>`;
 }
 
@@ -528,7 +520,7 @@ function statCard(icon, label, value, color='var(--cyan)', trend=null) {
   </div>`;
 }
 
-// ============ NAV ============
+
 function openApp(app) {
   clearAllIntervals();
   document.querySelectorAll('#landing, #rider-app, #driver-app, #admin-app').forEach(el => el.classList.add('hidden'));
@@ -544,7 +536,7 @@ function clearAllIntervals() {
   intervals = {};
 }
 
-// ============ RIDER APP ============
+
 function toggleMenu(show) {
   document.getElementById('rider-menu').classList.toggle('hidden', !show);
 }
@@ -582,27 +574,27 @@ function renderRider() {
   const distance = (s.pickup && s.drop) ? (Math.random()*15+3).toFixed(1) : 0;
   const fare = s.selectedVehicle ? Math.round(s.selectedVehicle.base + s.selectedVehicle.rate * distance) : 0;
 
-  // Store computed values
+  
   s._distance = distance;
   s._fare = fare;
 
   let html = '';
 
-  // HOME
+  
   if(s.step === 'home') {
     html = `
       <div style="margin-bottom:20px;">
-        <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">Where to? 🚀</h2>
+        <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">Where to? </h2>
         <p style="color:var(--gray);font-size:13px;">Book a ride across Delhi</p>
       </div>
       ${mapHTML(200)}
       <div style="display:flex;gap:10px;margin:20px 0;overflow-x:auto;padding-bottom:4px;">
-        ${["🏠 Home","💼 Office","🛒 Market","🏥 Hospital"].map(q =>
+        ${[" Home"," Office"," Market"," Hospital"].map(q =>
           `<button style="background:var(--card-bg2);border:1px solid rgba(0,229,255,0.08);border-radius:12px;padding:10px 16px;color:var(--gray-light);font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0;" onclick="state.rider.pickup='My Location';state.rider.drop='${q.split(' ')[1]}';riderGo('booking');">${q}</button>`
         ).join('')}
       </div>
       <button onclick="riderGo('booking')" style="width:100%;padding:16px 18px;background:var(--card-bg);border:1px solid rgba(0,229,255,0.12);border-radius:14px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;">
-        <span style="color:var(--gray);font-size:16px;">🔍</span>
+        <span style="color:var(--gray);font-size:16px;"></span>
         <span style="color:var(--gray);font-size:14px;">Search destination...</span>
       </button>
       <div style="margin-top:24px;">
@@ -612,7 +604,7 @@ function renderRider() {
         </div>
         ${RIDE_HISTORY.slice(0,2).map(r => `
           <button onclick="state.rider.pickup='${r.from}';state.rider.drop='${r.to}';riderGo('booking');" style="width:100%;background:var(--card-bg);border:1px solid rgba(0,229,255,0.04);border-radius:12px;padding:14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;">
-            <span style="color:var(--gray);">🕐</span>
+            <span style="color:var(--gray);"></span>
             <div style="flex:1;"><div style="font-size:13px;">${r.from} → ${r.to}</div><div style="color:var(--gray);font-size:11px;">${r.date} · ₹${r.fare}</div></div>
             <span style="color:var(--gray);">›</span>
           </button>
@@ -620,7 +612,7 @@ function renderRider() {
       </div>`;
   }
 
-  // BOOKING
+
   else if(s.step === 'booking') {
     html = `
       <button class="btn-icon" onclick="riderGo('home')" style="margin-bottom:16px;">←</button>
@@ -650,7 +642,7 @@ function renderRider() {
       <button class="btn btn-primary" onclick="if(state.rider.pickup&&state.rider.drop)riderGo('vehicle');" style="${(!s.pickup||!s.drop)?'opacity:0.4;pointer-events:none;':''}">Choose Vehicle →</button>`;
   }
 
-  // VEHICLE
+ 
   else if(s.step === 'vehicle') {
     html = `
       <button class="btn-icon" onclick="riderGo('booking')" style="margin-bottom:16px;">←</button>
@@ -671,7 +663,7 @@ function renderRider() {
       <div class="card" style="margin-top:12px;">
         <div style="color:var(--gray);font-size:11px;margin-bottom:8px;">Payment Method</div>
         <div style="display:flex;gap:8px;">
-          ${[{id:"cash",l:"💵 Cash"},{id:"upi",l:"📱 UPI"},{id:"card",l:"💳 Card"}].map(p =>
+          ${[{id:"cash",l:" Cash"},{id:"upi",l:" UPI"},{id:"card",l:" Card"}].map(p =>
             `<button class="pay-opt ${s.payment===p.id?'active':''}" onclick="state.rider.payment='${p.id}';renderRider();">${p.l}</button>`
           ).join('')}
         </div>
@@ -679,7 +671,7 @@ function renderRider() {
       ${s.selectedVehicle ? `<button class="btn btn-primary" style="margin-top:8px;" onclick="riderGo('confirm')">Confirm Ride — ₹${s._fare || fare}</button>` : ''}`;
   }
 
-  // CONFIRM
+  
   else if(s.step === 'confirm') {
     html = `
       <div style="text-align:center;padding:30px 0 20px;">
@@ -701,7 +693,7 @@ function renderRider() {
       <button class="btn btn-success" style="margin-top:20px;" onclick="state.rider.driverPos=0;riderGo('tracking')">✅ Driver Found — Track Ride</button>`;
   }
 
-  // TRACKING
+
   else if(s.step === 'tracking') {
     html = `
       ${mapHTML(240, s.pickup, s.drop, true, s.driverPos)}
@@ -719,7 +711,7 @@ function renderRider() {
             <div style="font-weight:600;font-size:15px;">Rajesh Kumar</div>
             <div style="display:flex;align-items:center;gap:4px;"><span style="color:var(--warning);font-size:12px;">★ 4.8</span><span style="color:var(--gray);font-size:12px;"> · DL 01 AB 1234</span></div>
           </div>
-          <span style="font-size:28px;">${s.selectedVehicle?.icon||'🚗'}</span>
+          <span style="font-size:28px;">${s.selectedVehicle?.icon||''}</span>
         </div>
         <div style="display:flex;gap:8px;">
           <button class="btn-sm" style="flex:1;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);color:var(--success);">📞 Call</button>
@@ -733,7 +725,7 @@ function renderRider() {
         <div class="card" style="text-align:center;margin:0;"><div style="color:var(--success);font-size:20px;font-weight:700;">₹${s._fare}</div><div style="color:var(--gray);font-size:11px;">Fare</div></div>
       </div>`;
 
-    // Start tracking animation
+
     clearAllIntervals();
     setTimeout(() => {
       intervals.tracking = setInterval(() => {
@@ -751,7 +743,7 @@ function renderRider() {
     }, 100);
   }
 
-  // RATING
+
   else if(s.step === 'rating') {
     html = `
       <div style="text-align:center;padding:20px 0;">
@@ -780,12 +772,12 @@ function renderRider() {
 
 function showSuggestions(type) {
   document.getElementById(type+'-suggestions')?.classList.remove('hidden');
-  // hide other
+  
   const other = type==='pickup'?'drop':'pickup';
   document.getElementById(other+'-suggestions')?.classList.add('hidden');
 }
 
-// ============ DRIVER APP ============
+
 function driverGo(step) {
   clearAllIntervals();
   state.driver.step = step;
@@ -797,7 +789,7 @@ function renderDriver() {
   const s = state.driver;
   let html = '';
 
-  // Header
+  
   html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
     <div style="display:flex;align-items:center;gap:8px;">
       <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;">
@@ -811,7 +803,7 @@ function renderDriver() {
     </div>
   </div>`;
 
-  // HOME
+ 
   if(s.step === 'home') {
     html += `
       <div style="margin-bottom:20px;">
@@ -823,10 +815,10 @@ function renderDriver() {
       </button>
       ${s.isOnline ? mapHTML(160) : ''}
       <div class="grid-2" style="margin-top:${s.isOnline?16:0}px;margin-bottom:16px;">
-        ${statCard('💰','Today','₹2,450','var(--success)')}
-        ${statCard('🚗',"Today's Trips",'8','var(--cyan)')}
-        ${statCard('📈','This Week','₹14,800','var(--warning)')}
-        ${statCard('📊','This Month','₹54,200','#7B61FF')}
+        ${statCard('','Today','₹2,450','var(--success)')}
+        ${statCard('',"Today's Trips",'8','var(--cyan)')}
+        ${statCard('','This Week','₹14,800','var(--warning)')}
+        ${statCard('','This Month','₹54,200','#7B61FF')}
       </div>
       <div class="card">
         <div style="font-weight:600;margin-bottom:12px;">Today's Trips</div>
@@ -840,7 +832,7 @@ function renderDriver() {
       </div>`;
   }
 
-  // REQUEST
+
   else if(s.step === 'request') {
     html += `<div style="text-align:center;">
       <div style="width:100px;height:100px;border-radius:50%;margin:20px auto 24px;position:relative;display:flex;align-items:center;justify-content:center;">
@@ -867,7 +859,7 @@ function renderDriver() {
       </div>
     </div>`;
 
-    // Timer countdown
+   
     clearAllIntervals();
     setTimeout(() => {
       intervals.request = setInterval(() => {
@@ -881,7 +873,7 @@ function renderDriver() {
     }, 100);
   }
 
-  // NAVIGATING
+  
   else if(s.step === 'navigating') {
     html += `
       <div style="background:linear-gradient(135deg,var(--primary),var(--cyan));border-radius:16px;padding:20px;margin-bottom:16px;text-align:center;">
@@ -901,11 +893,11 @@ function renderDriver() {
       <button class="btn btn-success" style="margin-top:12px;" onclick="state.driver.tripProgress=0;driverGo('trip')">▶ Start Trip — Rider Picked Up</button>`;
   }
 
-  // TRIP
+
   else if(s.step === 'trip') {
     html += `
       <div style="background:rgba(255,214,0,0.08);border:1px solid rgba(255,214,0,0.2);border-radius:16px;padding:16px;margin-bottom:16px;text-align:center;">
-        <div style="color:var(--warning);font-size:12px;margin-bottom:2px;">🚗 Trip In Progress</div>
+        <div style="color:var(--warning);font-size:12px;margin-bottom:2px;"> Trip In Progress</div>
         <div style="font-size:22px;font-weight:700;">Hauz Khas Village</div>
         <div class="progress-bar" style="margin-top:10px;"><div class="progress-fill" id="trip-progress-fill" style="width:${s.tripProgress}%;background:linear-gradient(90deg,var(--warning),var(--success));"></div></div>
         <div style="color:var(--gray);font-size:11px;margin-top:6px;" id="trip-progress-text">${s.tripProgress}% complete · ${Math.max(1,Math.round((100-s.tripProgress)/12))} min left</div>
@@ -932,7 +924,7 @@ function renderDriver() {
     }, 100);
   }
 
-  // COMPLETE
+ 
   else if(s.step === 'complete') {
     html += `
       <div style="text-align:center;padding:20px 0;">
@@ -955,13 +947,13 @@ function renderDriver() {
   c.innerHTML = html;
 }
 
-// ============ ADMIN DASHBOARD ============
+
 const ADMIN_TABS = [
-  { id:"overview", icon:"📊", label:"Overview" },
-  { id:"rides", icon:"🚗", label:"Rides" },
-  { id:"drivers", icon:"👥", label:"Drivers" },
-  { id:"pricing", icon:"💰", label:"Pricing" },
-  { id:"reports", icon:"📈", label:"Reports" },
+  { id:"overview", icon:"", label:"Overview" },
+  { id:"rides", icon:"", label:"Rides" },
+  { id:"drivers", icon:"", label:"Drivers" },
+  { id:"pricing", icon:"", label:"Pricing" },
+  { id:"reports", icon:"", label:"Reports" },
 ];
 
 function adminGo(tab) {
@@ -975,21 +967,21 @@ function renderAdmin() {
   const c = document.getElementById('admin-content');
   const s = state.admin;
 
-  // Render tabs
+ 
   tabsEl.innerHTML = ADMIN_TABS.map(t =>
     `<button class="tab-btn ${s.tab===t.id?'active':''}" onclick="adminGo('${t.id}')">${t.icon} ${t.label}</button>`
   ).join('');
 
   let html = '';
 
-  // OVERVIEW
+ 
   if(s.tab === 'overview') {
     html = `
       <div class="grid-2" style="margin-bottom:16px;">
-        ${statCard('🚗',"Today's Rides",'463','var(--cyan)',12)}
-        ${statCard('💰','Revenue','₹68.4K','var(--success)',8)}
-        ${statCard('👥','Active Drivers','127','#7B61FF',-3)}
-        ${statCard('👤','Active Riders','2,847','var(--warning)',15)}
+        ${statCard('',"Today's Rides",'463','var(--cyan)',12)}
+        ${statCard('','Revenue','₹68.4K','var(--success)',8)}
+        ${statCard('','Active Drivers','127','#7B61FF',-3)}
+        ${statCard('','Active Riders','2,847','var(--warning)',15)}
       </div>
       <div class="card"><div style="font-weight:600;margin-bottom:14px;">Weekly Revenue</div><div class="chart-container"><canvas id="revenue-chart" height="180"></canvas></div></div>
       <div class="card"><div style="font-weight:600;margin-bottom:14px;">Ride Distribution</div><div style="display:flex;align-items:center;">
@@ -1009,7 +1001,7 @@ function renderAdmin() {
       </div>`;
 
     setTimeout(() => {
-      // Revenue Chart
+     
       const rc = document.getElementById('revenue-chart');
       if(rc) {
         new Chart(rc, {
@@ -1033,7 +1025,7 @@ function renderAdmin() {
           }
         });
       }
-      // Pie Chart
+    
       const pc = document.getElementById('pie-chart');
       if(pc) {
         new Chart(pc, {
@@ -1048,7 +1040,7 @@ function renderAdmin() {
     }, 50);
   }
 
-  // RIDES
+  
   else if(s.tab === 'rides') {
     html = `
       <div style="display:flex;gap:8px;margin-bottom:14px;">
@@ -1063,8 +1055,8 @@ function renderAdmin() {
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="color:var(--success);font-size:10px;">●</span><span style="color:var(--gray-light);font-size:12px;">${r.from}</span></div>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span style="color:var(--danger);font-size:10px;">◎</span><span style="color:var(--gray-light);font-size:12px;">${r.to}</span></div>
           <div style="display:flex;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(136,146,176,0.06);font-size:11px;">
-            <span style="color:var(--gray);">🧑 ${r.rider}</span>
-            <span style="color:var(--gray);">🚘 ${r.driver||'—'}</span>
+            <span style="color:var(--gray);"> ${r.rider}</span>
+            <span style="color:var(--gray);"> ${r.driver||'—'}</span>
             <span style="color:var(--gray);">${r.vehicle} · ${r.distance}</span>
             <span style="color:var(--success);font-weight:600;">₹${r.fare}</span>
           </div>
@@ -1072,7 +1064,7 @@ function renderAdmin() {
       `).join('')}`;
   }
 
-  // DRIVERS
+ 
   else if(s.tab === 'drivers') {
     if(s.selectedDriver) {
       const d = s.selectedDriver;
@@ -1110,7 +1102,7 @@ function renderAdmin() {
     }
   }
 
-  // PRICING
+ 
   else if(s.tab === 'pricing') {
     const p = s.pricing;
     html = `<h3 style="font-size:18px;font-weight:700;margin-bottom:16px;">Pricing Rules</h3>
@@ -1133,7 +1125,7 @@ function renderAdmin() {
     </div>
     <div class="card" style="border-color:rgba(255,214,0,0.12);">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-        <span>⚡</span><span style="font-weight:600;">Surge Pricing</span>
+        <span></span><span style="font-weight:600;">Surge Pricing</span>
       </div>
       <div style="display:flex;gap:8px;">
         ${[1.0,1.25,1.5,1.75,2.0].map(sv => `<button class="surge-btn ${p.surge===sv?'active':''}" onclick="state.admin.pricing.surge=${sv};renderAdmin();">${sv}x</button>`).join('')}
@@ -1161,10 +1153,10 @@ function renderAdmin() {
       </div>
     </div>
     <div class="grid-2">
-      ${statCard('📈','Avg Fare','₹247','var(--cyan)')}
-      ${statCard('⏱️','Avg Duration','18 min','var(--warning)')}
-      ${statCard('⭐','Avg Rating','4.6 ⭐','var(--warning)')}
-      ${statCard('❌','Cancel Rate','8.2%','var(--danger)')}
+      ${statCard('','Avg Fare','₹247','var(--cyan)')}
+      ${statCard('','Avg Duration','18 min','var(--warning)')}
+      ${statCard('','Avg Rating','4.6 ⭐','var(--warning)')}
+      ${statCard('','Cancel Rate','8.2%','var(--danger)')}
     </div>`;
 
     setTimeout(() => {
@@ -1213,7 +1205,7 @@ function renderAdmin() {
   c.innerHTML = html;
 }
 
-// Click outside to close suggestions
+
 document.addEventListener('click', (e) => {
   if(!e.target.closest('#pickup-input') && !e.target.closest('#pickup-suggestions'))
     document.getElementById('pickup-suggestions')?.classList.add('hidden');
