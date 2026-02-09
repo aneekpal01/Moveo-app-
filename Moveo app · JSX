@@ -1,0 +1,1503 @@
+import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  Car, MapPin, Navigation, Star, Phone, MessageSquare, Clock, DollarSign,
+  Users, Shield, Settings, BarChart3, TrendingUp, ChevronRight, ChevronLeft,
+  Search, Bell, Menu, X, Check, AlertCircle, Zap, Bike, Truck,
+  CreditCard, Wallet, Eye, EyeOff, LogOut, Home, Map, User, Activity,
+  ArrowRight, ArrowLeft, CircleDot, Target, Gauge, FileText, Ban,
+  CheckCircle, XCircle, Filter, Download, RefreshCw, Globe, Smartphone,
+  Mail, Lock, UserPlus, ChevronDown, Minus, Plus, Award, IndianRupee
+} from "lucide-react";
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
+
+// ============ CONSTANTS & DATA ============
+const COLORS = {
+  primary: "#0A1AFF",
+  primaryDark: "#0815CC",
+  cyan: "#00E5FF",
+  dark: "#0B0B0B",
+  darkBg: "#080C24",
+  cardBg: "#0E1438",
+  cardBg2: "#131A4A",
+  white: "#FFFFFF",
+  gray: "#8892B0",
+  grayLight: "#CCD6F6",
+  success: "#00E676",
+  warning: "#FFD600",
+  danger: "#FF1744",
+};
+
+const VEHICLES = [
+  { id: "bike", name: "Bike", icon: "🏍️", rate: 7, base: 25, eta: "2 min", desc: "Quick & affordable" },
+  { id: "mini", name: "Mini", icon: "🚗", rate: 12, base: 40, eta: "4 min", desc: "Compact sedan" },
+  { id: "sedan", name: "Sedan", icon: "🚘", rate: 16, base: 50, eta: "5 min", desc: "Comfortable ride" },
+  { id: "suv", name: "SUV", icon: "🚙", rate: 22, base: 80, eta: "7 min", desc: "Spacious & premium" },
+];
+
+const DELHI_PLACES = [
+  "Connaught Place", "India Gate", "Hauz Khas", "Saket", "Lajpat Nagar",
+  "Karol Bagh", "Dwarka Sec-21", "Rohini Sec-3", "Vasant Kunj", "Nehru Place",
+  "Rajouri Garden", "Chandni Chowk", "Preet Vihar", "Janakpuri", "Greater Kailash"
+];
+
+const revenueData = [
+  { day: "Mon", revenue: 45000, rides: 320 },
+  { day: "Tue", revenue: 52000, rides: 380 },
+  { day: "Wed", revenue: 48000, rides: 350 },
+  { day: "Thu", revenue: 61000, rides: 420 },
+  { day: "Fri", revenue: 73000, rides: 510 },
+  { day: "Sat", revenue: 82000, rides: 580 },
+  { day: "Sun", revenue: 67000, rides: 460 },
+];
+
+const vehicleDistData = [
+  { name: "Bike", value: 35, color: "#00E5FF" },
+  { name: "Mini", value: 30, color: "#0A1AFF" },
+  { name: "Sedan", value: 25, color: "#7B61FF" },
+  { name: "SUV", value: 10, color: "#FF6B6B" },
+];
+
+const hourlyData = Array.from({ length: 24 }, (_, i) => ({
+  hour: `${i}:00`,
+  rides: Math.floor(Math.random() * 60) + (i >= 8 && i <= 10 ? 40 : i >= 17 && i <= 20 ? 50 : 10),
+}));
+
+const MOCK_DRIVERS = [
+  { id: 1, name: "Rajesh Kumar", phone: "+91 98765 43210", vehicle: "Swift Dzire", plate: "DL 01 AB 1234", rating: 4.8, rides: 1247, status: "online", verified: true, earnings: 32500, joined: "2024-03-15" },
+  { id: 2, name: "Amit Singh", phone: "+91 87654 32109", vehicle: "WagonR", plate: "DL 02 CD 5678", rating: 4.6, rides: 892, status: "on_ride", verified: true, earnings: 28700, joined: "2024-05-22" },
+  { id: 3, name: "Suresh Yadav", phone: "+91 76543 21098", vehicle: "Alto 800", plate: "DL 03 EF 9012", rating: 4.3, rides: 456, status: "offline", verified: true, earnings: 15200, joined: "2024-08-10" },
+  { id: 4, name: "Vikram Sharma", phone: "+91 65432 10987", vehicle: "Ertiga", plate: "DL 04 GH 3456", rating: 4.9, rides: 2103, status: "online", verified: true, earnings: 54800, joined: "2023-11-05" },
+  { id: 5, name: "Deepak Verma", phone: "+91 54321 09876", vehicle: "Honda Activa", plate: "DL 05 IJ 7890", rating: 4.1, rides: 234, status: "offline", verified: false, earnings: 8900, joined: "2024-11-20" },
+  { id: 6, name: "Manoj Tiwari", phone: "+91 43210 98765", vehicle: "Creta", plate: "DL 06 KL 2345", rating: 4.7, rides: 1567, status: "online", verified: true, earnings: 41200, joined: "2024-01-18" },
+];
+
+const MOCK_RIDES = [
+  { id: "MV-1001", rider: "Ananya S.", driver: "Rajesh Kumar", from: "Connaught Place", to: "Hauz Khas", fare: 245, status: "completed", time: "10:34 AM", vehicle: "Sedan", distance: "8.2 km", rating: 5 },
+  { id: "MV-1002", rider: "Priya M.", driver: "Amit Singh", from: "Saket", to: "India Gate", fare: 180, status: "in_progress", time: "11:02 AM", vehicle: "Mini", distance: "6.1 km", rating: null },
+  { id: "MV-1003", rider: "Rohit K.", driver: "Vikram Sharma", from: "Dwarka", to: "Nehru Place", fare: 420, status: "completed", time: "09:15 AM", vehicle: "SUV", distance: "18.5 km", rating: 4 },
+  { id: "MV-1004", rider: "Sneha L.", driver: null, from: "Rohini", to: "Rajouri Garden", fare: 110, status: "cancelled", time: "09:45 AM", vehicle: "Bike", distance: "4.3 km", rating: null },
+  { id: "MV-1005", rider: "Karan J.", driver: "Manoj Tiwari", from: "Vasant Kunj", to: "Chandni Chowk", fare: 380, status: "completed", time: "08:20 AM", vehicle: "Sedan", distance: "15.8 km", rating: 5 },
+];
+
+// ============ LOGO COMPONENT ============
+const MoveoLogo = ({ size = 40, showText = true, light = false }) => (
+  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+    <div style={{
+      width: size, height: size, borderRadius: size * 0.22,
+      background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.cyan})`,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      position: "relative", overflow: "hidden",
+      boxShadow: `0 4px 20px ${COLORS.cyan}33`,
+    }}>
+      <svg width={size * 0.65} height={size * 0.65} viewBox="0 0 40 40" fill="none">
+        <path d="M5 32L13 8L20 22L27 8L35 32" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <path d="M20 22L20 32" stroke={COLORS.cyan} strokeWidth="2.5" strokeLinecap="round" />
+        <circle cx="20" cy="7" r="2" fill={COLORS.cyan} />
+      </svg>
+    </div>
+    {showText && (
+      <span style={{
+        fontSize: size * 0.55, fontWeight: 800, letterSpacing: 3,
+        color: light ? COLORS.white : COLORS.dark,
+        fontFamily: "'Poppins', sans-serif",
+      }}>MOVEO</span>
+    )}
+  </div>
+);
+
+// ============ SHARED COMPONENTS ============
+const StatusBadge = ({ status }) => {
+  const map = {
+    online: { bg: "#00E67622", color: "#00E676", text: "Online" },
+    offline: { bg: "#FF174422", color: "#FF1744", text: "Offline" },
+    on_ride: { bg: "#FFD60022", color: "#FFD600", text: "On Ride" },
+    completed: { bg: "#00E67622", color: "#00E676", text: "Completed" },
+    in_progress: { bg: "#00E5FF22", color: "#00E5FF", text: "In Progress" },
+    cancelled: { bg: "#FF174422", color: "#FF1744", text: "Cancelled" },
+    verified: { bg: "#00E67622", color: "#00E676", text: "Verified" },
+    pending: { bg: "#FFD60022", color: "#FFD600", text: "Pending" },
+  };
+  const s = map[status] || map.offline;
+  return (
+    <span style={{
+      padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 600,
+      background: s.bg, color: s.color, display: "inline-flex", alignItems: "center", gap: 4,
+    }}>
+      <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.color }} />
+      {s.text}
+    </span>
+  );
+};
+
+const StatCard = ({ icon: Icon, label, value, sub, color = COLORS.cyan, trend }) => (
+  <div style={{
+    background: COLORS.cardBg, borderRadius: 16, padding: "20px 22px",
+    border: `1px solid ${color}15`, position: "relative", overflow: "hidden",
+  }}>
+    <div style={{
+      position: "absolute", top: -20, right: -20, width: 80, height: 80,
+      borderRadius: "50%", background: `${color}08`,
+    }} />
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+      <div style={{
+        width: 38, height: 38, borderRadius: 10, display: "flex",
+        alignItems: "center", justifyContent: "center",
+        background: `${color}18`,
+      }}>
+        <Icon size={18} color={color} />
+      </div>
+      <span style={{ color: COLORS.gray, fontSize: 13 }}>{label}</span>
+    </div>
+    <div style={{ fontSize: 26, fontWeight: 700, color: COLORS.white }}>{value}</div>
+    {sub && <div style={{ fontSize: 12, color: COLORS.gray, marginTop: 4 }}>{sub}</div>}
+    {trend && (
+      <div style={{ fontSize: 11, color: trend > 0 ? COLORS.success : COLORS.danger, marginTop: 4, fontWeight: 600 }}>
+        {trend > 0 ? "↑" : "↓"} {Math.abs(trend)}% vs last week
+      </div>
+    )}
+  </div>
+);
+
+const MapSimulation = ({ pickup, drop, showDriver, driverPos = 30, style = {} }) => (
+  <div style={{
+    background: "#0a1628", borderRadius: 16, height: 280, position: "relative",
+    overflow: "hidden", border: `1px solid ${COLORS.cyan}15`, ...style,
+  }}>
+    {/* Grid lines */}
+    {Array.from({ length: 12 }).map((_, i) => (
+      <div key={`h${i}`} style={{
+        position: "absolute", top: `${(i + 1) * 8}%`, left: 0, right: 0,
+        height: 1, background: `${COLORS.cyan}08`,
+      }} />
+    ))}
+    {Array.from({ length: 16 }).map((_, i) => (
+      <div key={`v${i}`} style={{
+        position: "absolute", left: `${(i + 1) * 6.25}%`, top: 0, bottom: 0,
+        width: 1, background: `${COLORS.cyan}08`,
+      }} />
+    ))}
+    {/* Roads */}
+    <div style={{ position: "absolute", top: "40%", left: 0, right: 0, height: 3, background: `${COLORS.gray}30` }} />
+    <div style={{ position: "absolute", top: "65%", left: 0, right: 0, height: 2, background: `${COLORS.gray}20` }} />
+    <div style={{ position: "absolute", top: 0, bottom: 0, left: "30%", width: 3, background: `${COLORS.gray}30` }} />
+    <div style={{ position: "absolute", top: 0, bottom: 0, left: "70%", width: 2, background: `${COLORS.gray}20` }} />
+    {/* Route line */}
+    <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
+      <path d="M 80 180 Q 150 100 200 120 T 320 80" stroke={COLORS.cyan} strokeWidth="3" fill="none" strokeDasharray="8 4" opacity="0.6" />
+    </svg>
+    {/* Pickup */}
+    {pickup && (
+      <div style={{ position: "absolute", left: 65, top: 165, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: "50%", background: COLORS.success,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: `0 0 20px ${COLORS.success}44`,
+        }}>
+          <CircleDot size={16} color="white" />
+        </div>
+        <span style={{ fontSize: 10, color: COLORS.success, marginTop: 4, fontWeight: 600, whiteSpace: "nowrap" }}>{pickup}</span>
+      </div>
+    )}
+    {/* Drop */}
+    {drop && (
+      <div style={{ position: "absolute", right: 40, top: 55, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: "50%", background: COLORS.danger,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: `0 0 20px ${COLORS.danger}44`,
+        }}>
+          <Target size={16} color="white" />
+        </div>
+        <span style={{ fontSize: 10, color: COLORS.danger, marginTop: 4, fontWeight: 600, whiteSpace: "nowrap" }}>{drop}</span>
+      </div>
+    )}
+    {/* Driver */}
+    {showDriver && (
+      <div style={{
+        position: "absolute", left: `${20 + driverPos * 0.5}%`, top: `${55 - driverPos * 0.2}%`,
+        transition: "all 1s ease",
+      }}>
+        <div style={{
+          width: 36, height: 36, borderRadius: "50%",
+          background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.cyan})`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: `0 0 25px ${COLORS.cyan}55`, animation: "pulse 2s infinite",
+        }}>
+          <Car size={18} color="white" />
+        </div>
+      </div>
+    )}
+    {/* Label */}
+    <div style={{
+      position: "absolute", bottom: 10, left: 12,
+      background: `${COLORS.darkBg}CC`, backdropFilter: "blur(8px)",
+      padding: "6px 12px", borderRadius: 8, fontSize: 11, color: COLORS.gray,
+      display: "flex", alignItems: "center", gap: 6,
+    }}>
+      <Map size={12} color={COLORS.cyan} /> Delhi NCR — Live Map
+    </div>
+  </div>
+);
+
+// ============ RIDER APP ============
+const RiderApp = () => {
+  const [step, setStep] = useState("home"); // home, booking, vehicle, confirm, tracking, rating
+  const [pickup, setPickup] = useState("");
+  const [drop, setDrop] = useState("");
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [driverPos, setDriverPos] = useState(0);
+  const [rating, setRating] = useState(0);
+  const [pickupSuggestions, setPickupSuggestions] = useState(false);
+  const [dropSuggestions, setDropSuggestions] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [promoCode, setPromoCode] = useState("");
+  const [rideHistory] = useState([
+    { from: "Connaught Place", to: "Hauz Khas", fare: 245, date: "Today", rating: 5, driver: "Rajesh K." },
+    { from: "Saket", to: "India Gate", fare: 180, date: "Yesterday", rating: 4, driver: "Amit S." },
+    { from: "Dwarka", to: "Nehru Place", fare: 420, date: "2 days ago", rating: 5, driver: "Vikram S." },
+  ]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+
+  const distance = pickup && drop ? (Math.random() * 15 + 3).toFixed(1) : 0;
+  const fare = selectedVehicle ? Math.round(selectedVehicle.base + selectedVehicle.rate * distance) : 0;
+
+  useEffect(() => {
+    if (step === "tracking") {
+      const interval = setInterval(() => {
+        setDriverPos(p => {
+          if (p >= 100) { clearInterval(interval); setTimeout(() => setStep("rating"), 500); return 100; }
+          return p + 2;
+        });
+      }, 300);
+      return () => clearInterval(interval);
+    }
+  }, [step]);
+
+  if (showHistory) return (
+    <div style={{ padding: 20, minHeight: "100%" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+        <button onClick={() => setShowHistory(false)} style={{ background: `${COLORS.cyan}15`, border: "none", borderRadius: 10, width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          <ArrowLeft size={18} color={COLORS.cyan} />
+        </button>
+        <span style={{ fontSize: 20, fontWeight: 700, color: COLORS.white }}>Ride History</span>
+      </div>
+      {rideHistory.map((r, i) => (
+        <div key={i} style={{ background: COLORS.cardBg2, borderRadius: 14, padding: 16, marginBottom: 12, border: `1px solid ${COLORS.cyan}10` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+            <span style={{ color: COLORS.gray, fontSize: 12 }}>{r.date}</span>
+            <span style={{ color: COLORS.success, fontWeight: 700 }}>₹{r.fare}</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+            <CircleDot size={12} color={COLORS.success} />
+            <span style={{ color: COLORS.white, fontSize: 13 }}>{r.from}</span>
+          </div>
+          <div style={{ width: 1, height: 12, background: COLORS.gray, marginLeft: 6 }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Target size={12} color={COLORS.danger} />
+            <span style={{ color: COLORS.white, fontSize: 13 }}>{r.to}</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10, paddingTop: 10, borderTop: `1px solid ${COLORS.gray}20` }}>
+            <span style={{ color: COLORS.gray, fontSize: 12 }}>Driver: {r.driver}</span>
+            <div style={{ display: "flex", gap: 2 }}>
+              {[1, 2, 3, 4, 5].map(s => (
+                <Star key={s} size={12} fill={s <= r.rating ? COLORS.warning : "transparent"} color={COLORS.warning} />
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div style={{ minHeight: "100%", position: "relative" }}>
+      {/* Side Menu */}
+      {showMenu && (
+        <div style={{ position: "absolute", inset: 0, zIndex: 50, display: "flex" }}>
+          <div onClick={() => setShowMenu(false)} style={{ position: "absolute", inset: 0, background: "#000000AA" }} />
+          <div style={{ position: "relative", zIndex: 1, width: 260, background: COLORS.darkBg, padding: 24, height: "100%", animation: "slideIn 0.3s ease" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 30 }}>
+              <div style={{ width: 48, height: 48, borderRadius: "50%", background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.cyan})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <User size={22} color="white" />
+              </div>
+              <div>
+                <div style={{ color: COLORS.white, fontWeight: 600, fontSize: 15 }}>Debarghya</div>
+                <div style={{ color: COLORS.gray, fontSize: 12 }}>+91 99999 99999</div>
+              </div>
+            </div>
+            {[
+              { icon: Home, label: "Home", action: () => { setStep("home"); setShowMenu(false); } },
+              { icon: Clock, label: "Ride History", action: () => { setShowHistory(true); setShowMenu(false); } },
+              { icon: Wallet, label: "Wallet: ₹2,450", action: () => {} },
+              { icon: CreditCard, label: "Payment Methods", action: () => {} },
+              { icon: Award, label: "Rewards", action: () => {} },
+              { icon: Settings, label: "Settings", action: () => {} },
+              { icon: Shield, label: "Safety", action: () => {} },
+            ].map(item => (
+              <button key={item.label} onClick={item.action} style={{
+                display: "flex", alignItems: "center", gap: 14, width: "100%",
+                padding: "14px 0", border: "none", background: "none", cursor: "pointer",
+                borderBottom: `1px solid ${COLORS.gray}15`,
+              }}>
+                <item.icon size={18} color={COLORS.gray} />
+                <span style={{ color: COLORS.grayLight, fontSize: 14 }}>{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div style={{ padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <button onClick={() => setShowMenu(true)} style={{ background: `${COLORS.cyan}12`, border: "none", borderRadius: 10, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          <Menu size={18} color={COLORS.cyan} />
+        </button>
+        <MoveoLogo size={30} light />
+        <button style={{ background: `${COLORS.cyan}12`, border: "none", borderRadius: 10, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
+          <Bell size={18} color={COLORS.cyan} />
+          <span style={{ position: "absolute", top: 6, right: 6, width: 8, height: 8, borderRadius: "50%", background: COLORS.danger }} />
+        </button>
+      </div>
+
+      <div style={{ padding: "0 20px 20px" }}>
+        {/* HOME */}
+        {step === "home" && (
+          <>
+            <div style={{ marginBottom: 20 }}>
+              <h2 style={{ color: COLORS.white, fontSize: 24, fontWeight: 700, margin: "0 0 4px" }}>Where to? 🚀</h2>
+              <p style={{ color: COLORS.gray, fontSize: 13, margin: 0 }}>Book a ride across Delhi</p>
+            </div>
+
+            <MapSimulation pickup={null} drop={null} showDriver={false} style={{ marginBottom: 20, height: 200 }} />
+
+            {/* Quick destinations */}
+            <div style={{ display: "flex", gap: 10, marginBottom: 20, overflowX: "auto", paddingBottom: 4 }}>
+              {[" Home", " Office", " Market", " Hospital"].map(q => (
+                <button key={q} onClick={() => { setPickup("My Location"); setDrop(q.split(" ")[1]); setStep("booking"); }} style={{
+                  background: COLORS.cardBg2, border: `1px solid ${COLORS.cyan}15`, borderRadius: 12,
+                  padding: "10px 16px", color: COLORS.grayLight, fontSize: 13, cursor: "pointer",
+                  whiteSpace: "nowrap", flexShrink: 0,
+                }}>
+                  {q}
+                </button>
+              ))}
+            </div>
+
+            {/* Search bar */}
+            <button onClick={() => setStep("booking")} style={{
+              width: "100%", padding: "16px 18px", background: COLORS.cardBg,
+              border: `1px solid ${COLORS.cyan}20`, borderRadius: 14, cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 12, textAlign: "left",
+            }}>
+              <Search size={18} color={COLORS.gray} />
+              <span style={{ color: COLORS.gray, fontSize: 14 }}>Search destination...</span>
+            </button>
+
+            {/* Recent rides */}
+            <div style={{ marginTop: 24 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                <span style={{ color: COLORS.white, fontWeight: 600, fontSize: 16 }}>Recent Rides</span>
+                <button onClick={() => setShowHistory(true)} style={{ background: "none", border: "none", color: COLORS.cyan, fontSize: 13, cursor: "pointer" }}>View All →</button>
+              </div>
+              {rideHistory.slice(0, 2).map((r, i) => (
+                <button key={i} onClick={() => { setPickup(r.from); setDrop(r.to); setStep("booking"); }} style={{
+                  width: "100%", background: COLORS.cardBg, border: `1px solid ${COLORS.cyan}08`, borderRadius: 12,
+                  padding: 14, marginBottom: 8, cursor: "pointer", display: "flex",
+                  alignItems: "center", gap: 12, textAlign: "left",
+                }}>
+                  <Clock size={16} color={COLORS.gray} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ color: COLORS.white, fontSize: 13 }}>{r.from} → {r.to}</div>
+                    <div style={{ color: COLORS.gray, fontSize: 11 }}>{r.date} · ₹{r.fare}</div>
+                  </div>
+                  <ChevronRight size={16} color={COLORS.gray} />
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* BOOKING */}
+        {step === "booking" && (
+          <>
+            <button onClick={() => setStep("home")} style={{ background: `${COLORS.cyan}12`, border: "none", borderRadius: 10, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", marginBottom: 16 }}>
+              <ArrowLeft size={16} color={COLORS.cyan} />
+            </button>
+            <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 18, marginBottom: 16, border: `1px solid ${COLORS.cyan}10` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0 }}>
+                  <CircleDot size={16} color={COLORS.success} />
+                  <div style={{ width: 2, height: 30, background: `${COLORS.gray}30`, margin: "2px 0" }} />
+                  <Target size={16} color={COLORS.danger} />
+                </div>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      value={pickup}
+                      onChange={e => { setPickup(e.target.value); setPickupSuggestions(true); }}
+                      onFocus={() => setPickupSuggestions(true)}
+                      placeholder="Pickup location"
+                      style={{
+                        width: "100%", padding: "10px 14px", background: COLORS.cardBg2,
+                        border: `1px solid ${COLORS.cyan}15`, borderRadius: 10,
+                        color: COLORS.white, fontSize: 13, outline: "none", boxSizing: "border-box",
+                      }}
+                    />
+                    {pickupSuggestions && !pickup && (
+                      <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: COLORS.cardBg2, borderRadius: "0 0 10px 10px", zIndex: 10, border: `1px solid ${COLORS.cyan}15`, borderTop: "none" }}>
+                        {DELHI_PLACES.slice(0, 5).map(p => (
+                          <button key={p} onClick={() => { setPickup(p); setPickupSuggestions(false); }} style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "10px 14px", background: "none", border: "none", borderBottom: `1px solid ${COLORS.gray}10`, cursor: "pointer", textAlign: "left" }}>
+                            <MapPin size={13} color={COLORS.gray} />
+                            <span style={{ color: COLORS.grayLight, fontSize: 12 }}>{p}, Delhi</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      value={drop}
+                      onChange={e => { setDrop(e.target.value); setDropSuggestions(true); }}
+                      onFocus={() => setDropSuggestions(true)}
+                      placeholder="Drop location"
+                      style={{
+                        width: "100%", padding: "10px 14px", background: COLORS.cardBg2,
+                        border: `1px solid ${COLORS.cyan}15`, borderRadius: 10,
+                        color: COLORS.white, fontSize: 13, outline: "none", boxSizing: "border-box",
+                      }}
+                    />
+                    {dropSuggestions && !drop && (
+                      <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: COLORS.cardBg2, borderRadius: "0 0 10px 10px", zIndex: 10, border: `1px solid ${COLORS.cyan}15`, borderTop: "none" }}>
+                        {DELHI_PLACES.slice(5, 10).map(p => (
+                          <button key={p} onClick={() => { setDrop(p); setDropSuggestions(false); }} style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "10px 14px", background: "none", border: "none", borderBottom: `1px solid ${COLORS.gray}10`, cursor: "pointer", textAlign: "left" }}>
+                            <MapPin size={13} color={COLORS.gray} />
+                            <span style={{ color: COLORS.grayLight, fontSize: 12 }}>{p}, Delhi</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {pickup && drop && (
+              <button onClick={() => setStep("vehicle")} style={{
+                width: "100%", padding: 16,
+                background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.cyan})`,
+                border: "none", borderRadius: 14, color: "white", fontSize: 15, fontWeight: 700,
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              }}>
+                Choose Vehicle <ArrowRight size={18} />
+              </button>
+            )}
+          </>
+        )}
+
+        {/* VEHICLE SELECT */}
+        {step === "vehicle" && (
+          <>
+            <button onClick={() => setStep("booking")} style={{ background: `${COLORS.cyan}12`, border: "none", borderRadius: 10, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", marginBottom: 16 }}>
+              <ArrowLeft size={16} color={COLORS.cyan} />
+            </button>
+            <MapSimulation pickup={pickup} drop={drop} showDriver={false} style={{ marginBottom: 16, height: 180 }} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <span style={{ color: COLORS.white, fontWeight: 600, fontSize: 16 }}>Choose your ride</span>
+              <span style={{ color: COLORS.gray, fontSize: 12 }}>{distance} km</span>
+            </div>
+            {VEHICLES.map(v => {
+              const vFare = Math.round(v.base + v.rate * distance);
+              const selected = selectedVehicle?.id === v.id;
+              return (
+                <button key={v.id} onClick={() => setSelectedVehicle(v)} style={{
+                  width: "100%", display: "flex", alignItems: "center", gap: 14,
+                  padding: 14, marginBottom: 8, borderRadius: 14, cursor: "pointer",
+                  background: selected ? `${COLORS.cyan}12` : COLORS.cardBg,
+                  border: selected ? `2px solid ${COLORS.cyan}` : `1px solid ${COLORS.cyan}10`,
+                  textAlign: "left", transition: "all 0.2s",
+                }}>
+                  <span style={{ fontSize: 30 }}>{v.icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ color: COLORS.white, fontWeight: 600, fontSize: 14 }}>{v.name}</div>
+                    <div style={{ color: COLORS.gray, fontSize: 11 }}>{v.desc} · {v.eta}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ color: COLORS.white, fontWeight: 700, fontSize: 16 }}>₹{vFare}</div>
+                    <div style={{ color: COLORS.gray, fontSize: 10 }}>₹{v.rate}/km</div>
+                  </div>
+                </button>
+              );
+            })}
+
+            {/* Payment Method */}
+            <div style={{ background: COLORS.cardBg, borderRadius: 14, padding: 14, marginTop: 12, marginBottom: 12, border: `1px solid ${COLORS.cyan}10` }}>
+              <div style={{ color: COLORS.gray, fontSize: 11, marginBottom: 8 }}>Payment Method</div>
+              <div style={{ display: "flex", gap: 8 }}>
+                {[
+                  { id: "cash", label: " Cash", },
+                  { id: "upi", label: " UPI" },
+                  { id: "card", label: " Card" },
+                ].map(pm => (
+                  <button key={pm.id} onClick={() => setPaymentMethod(pm.id)} style={{
+                    flex: 1, padding: "8px 0", borderRadius: 10, border: paymentMethod === pm.id ? `2px solid ${COLORS.cyan}` : `1px solid ${COLORS.gray}20`,
+                    background: paymentMethod === pm.id ? `${COLORS.cyan}12` : COLORS.cardBg2,
+                    color: COLORS.white, fontSize: 12, cursor: "pointer",
+                  }}>
+                    {pm.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {selectedVehicle && (
+              <button onClick={() => { setStep("confirm"); }} style={{
+                width: "100%", padding: 16, marginTop: 4,
+                background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.cyan})`,
+                border: "none", borderRadius: 14, color: "white", fontSize: 15, fontWeight: 700,
+                cursor: "pointer",
+              }}>
+                Confirm Ride — ₹{fare}
+              </button>
+            )}
+          </>
+        )}
+
+        {/* CONFIRM */}
+        {step === "confirm" && (
+          <>
+            <div style={{ textAlign: "center", padding: "30px 0 20px" }}>
+              <div style={{
+                width: 70, height: 70, borderRadius: "50%", margin: "0 auto 16px",
+                background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.cyan})`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                animation: "pulse 1.5s infinite",
+              }}>
+                <Search size={30} color="white" />
+              </div>
+              <h3 style={{ color: COLORS.white, margin: "0 0 6px", fontSize: 20 }}>Finding your driver...</h3>
+              <p style={{ color: COLORS.gray, fontSize: 13, margin: 0 }}>Usually takes less than 30 seconds</p>
+            </div>
+
+            <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 18, marginTop: 20, border: `1px solid ${COLORS.cyan}10` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                <span style={{ fontSize: 24 }}>{selectedVehicle?.icon}</span>
+                <div>
+                  <div style={{ color: COLORS.white, fontWeight: 600 }}>{selectedVehicle?.name}</div>
+                  <div style={{ color: COLORS.gray, fontSize: 12 }}>{distance} km · {selectedVehicle?.eta}</div>
+                </div>
+                <div style={{ marginLeft: "auto", color: COLORS.cyan, fontWeight: 700, fontSize: 18 }}>₹{fare}</div>
+              </div>
+              <div style={{ borderTop: `1px solid ${COLORS.gray}15`, paddingTop: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                  <CircleDot size={12} color={COLORS.success} />
+                  <span style={{ color: COLORS.grayLight, fontSize: 13 }}>{pickup}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Target size={12} color={COLORS.danger} />
+                  <span style={{ color: COLORS.grayLight, fontSize: 13 }}>{drop}</span>
+                </div>
+              </div>
+            </div>
+
+            <button onClick={() => { setDriverPos(0); setStep("tracking"); }} style={{
+              width: "100%", padding: 16, marginTop: 20,
+              background: `linear-gradient(135deg, ${COLORS.success}, #00C853)`,
+              border: "none", borderRadius: 14, color: "white", fontSize: 15, fontWeight: 700,
+              cursor: "pointer",
+            }}>
+              ✅ Driver Found — Track Ride
+            </button>
+          </>
+        )}
+
+        {/* TRACKING */}
+        {step === "tracking" && (
+          <>
+            <MapSimulation pickup={pickup} drop={drop} showDriver driverPos={driverPos} style={{ marginBottom: 16, height: 240 }} />
+
+            {/* Progress bar */}
+            <div style={{ background: COLORS.cardBg, borderRadius: 12, padding: 14, marginBottom: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                <span style={{ color: COLORS.gray, fontSize: 12 }}>Ride Progress</span>
+                <span style={{ color: COLORS.cyan, fontSize: 12, fontWeight: 600 }}>{driverPos}%</span>
+              </div>
+              <div style={{ height: 6, background: COLORS.cardBg2, borderRadius: 3, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${driverPos}%`, background: `linear-gradient(90deg, ${COLORS.primary}, ${COLORS.cyan})`, borderRadius: 3, transition: "width 0.3s" }} />
+              </div>
+            </div>
+
+            {/* Driver card */}
+            <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 16, border: `1px solid ${COLORS.cyan}10` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
+                <div style={{
+                  width: 50, height: 50, borderRadius: "50%",
+                  background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.cyan})`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <User size={24} color="white" />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: COLORS.white, fontWeight: 600, fontSize: 15 }}>Rajesh Kumar</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <Star size={12} fill={COLORS.warning} color={COLORS.warning} />
+                    <span style={{ color: COLORS.warning, fontSize: 12 }}>4.8</span>
+                    <span style={{ color: COLORS.gray, fontSize: 12 }}> · DL 01 AB 1234</span>
+                  </div>
+                </div>
+                <span style={{ fontSize: 28 }}>{selectedVehicle?.icon}</span>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button style={{ flex: 1, padding: 10, background: `${COLORS.success}15`, border: `1px solid ${COLORS.success}30`, borderRadius: 10, color: COLORS.success, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <Phone size={14} /> Call
+                </button>
+                <button style={{ flex: 1, padding: 10, background: `${COLORS.cyan}15`, border: `1px solid ${COLORS.cyan}30`, borderRadius: 10, color: COLORS.cyan, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <MessageSquare size={14} /> Chat
+                </button>
+                <button style={{ flex: 1, padding: 10, background: `${COLORS.danger}15`, border: `1px solid ${COLORS.danger}30`, borderRadius: 10, color: COLORS.danger, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <AlertCircle size={14} /> SOS
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+              <div style={{ flex: 1, background: COLORS.cardBg, borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
+                <div style={{ color: COLORS.cyan, fontSize: 20, fontWeight: 700 }}>{Math.max(1, Math.round((100 - driverPos) / 10))} min</div>
+                <div style={{ color: COLORS.gray, fontSize: 11 }}>ETA</div>
+              </div>
+              <div style={{ flex: 1, background: COLORS.cardBg, borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
+                <div style={{ color: COLORS.white, fontSize: 20, fontWeight: 700 }}>{distance} km</div>
+                <div style={{ color: COLORS.gray, fontSize: 11 }}>Distance</div>
+              </div>
+              <div style={{ flex: 1, background: COLORS.cardBg, borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
+                <div style={{ color: COLORS.success, fontSize: 20, fontWeight: 700 }}>₹{fare}</div>
+                <div style={{ color: COLORS.gray, fontSize: 11 }}>Fare</div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* RATING */}
+        {step === "rating" && (
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+            <div style={{
+              width: 80, height: 80, borderRadius: "50%", margin: "0 auto 20px",
+              background: `linear-gradient(135deg, ${COLORS.success}, #00C853)`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <Check size={40} color="white" />
+            </div>
+            <h2 style={{ color: COLORS.white, margin: "0 0 6px" }}>Ride Complete! 🎉</h2>
+            <p style={{ color: COLORS.gray, fontSize: 14, margin: "0 0 24px" }}>{pickup} → {drop}</p>
+
+            <div style={{
+              background: COLORS.cardBg, borderRadius: 20, padding: 24, marginBottom: 20,
+              border: `1px solid ${COLORS.cyan}10`,
+            }}>
+              <div style={{ fontSize: 36, fontWeight: 800, color: COLORS.cyan, marginBottom: 4 }}>₹{fare}</div>
+              <div style={{ color: COLORS.gray, fontSize: 13, marginBottom: 16 }}>Paid via {paymentMethod.toUpperCase()}</div>
+              <div style={{ display: "flex", justifyContent: "center", gap: 10, padding: "12px 0", borderTop: `1px solid ${COLORS.gray}15` }}>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ color: COLORS.white, fontWeight: 600 }}>{distance} km</div>
+                  <div style={{ color: COLORS.gray, fontSize: 11 }}>Distance</div>
+                </div>
+                <div style={{ width: 1, background: `${COLORS.gray}20` }} />
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ color: COLORS.white, fontWeight: 600 }}>12 min</div>
+                  <div style={{ color: COLORS.gray, fontSize: 11 }}>Duration</div>
+                </div>
+                <div style={{ width: 1, background: `${COLORS.gray}20` }} />
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ color: COLORS.white, fontWeight: 600 }}>{selectedVehicle?.name}</div>
+                  <div style={{ color: COLORS.gray, fontSize: 11 }}>Vehicle</div>
+                </div>
+              </div>
+            </div>
+
+            <p style={{ color: COLORS.grayLight, fontSize: 15, marginBottom: 12 }}>Rate your driver</p>
+            <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 24 }}>
+              {[1, 2, 3, 4, 5].map(s => (
+                <button key={s} onClick={() => setRating(s)} style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  transform: rating >= s ? "scale(1.2)" : "scale(1)",
+                  transition: "transform 0.2s",
+                }}>
+                  <Star size={36} fill={rating >= s ? COLORS.warning : "transparent"} color={COLORS.warning} strokeWidth={1.5} />
+                </button>
+              ))}
+            </div>
+
+            <button onClick={() => { setStep("home"); setPickup(""); setDrop(""); setSelectedVehicle(null); setRating(0); setDriverPos(0); }} style={{
+              width: "100%", padding: 16,
+              background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.cyan})`,
+              border: "none", borderRadius: 14, color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer",
+            }}>
+              Done — Book Another Ride
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============ DRIVER APP ============
+const DriverApp = () => {
+  const [isOnline, setIsOnline] = useState(false);
+  const [driverStep, setDriverStep] = useState("home"); // home, request, navigating, trip, complete
+  const [earnings] = useState({ today: 2450, week: 14800, month: 54200, trips: 8 });
+  const [timer, setTimer] = useState(15);
+  const [tripProgress, setTripProgress] = useState(0);
+
+  useEffect(() => {
+    if (driverStep === "request" && timer > 0) {
+      const t = setTimeout(() => setTimer(timer - 1), 1000);
+      return () => clearTimeout(t);
+    }
+  }, [driverStep, timer]);
+
+  useEffect(() => {
+    if (driverStep === "trip") {
+      const interval = setInterval(() => {
+        setTripProgress(p => {
+          if (p >= 100) { clearInterval(interval); setDriverStep("complete"); return 100; }
+          return p + 3;
+        });
+      }, 400);
+      return () => clearInterval(interval);
+    }
+  }, [driverStep]);
+
+  return (
+    <div style={{ minHeight: "100%", padding: 20 }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <MoveoLogo size={28} light />
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <StatusBadge status={isOnline ? "online" : "offline"} />
+          <div style={{
+            width: 44, height: 44, borderRadius: "50%",
+            background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.cyan})`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <User size={20} color="white" />
+          </div>
+        </div>
+      </div>
+
+      {/* HOME */}
+      {driverStep === "home" && (
+        <>
+          <div style={{ marginBottom: 20 }}>
+            <h2 style={{ color: COLORS.white, fontSize: 22, fontWeight: 700, margin: "0 0 4px" }}>
+              {isOnline ? "You're Online 🟢" : "Go Online to Start 🔴"}
+            </h2>
+            <p style={{ color: COLORS.gray, fontSize: 13, margin: 0 }}>
+              {isOnline ? "Waiting for ride requests..." : "Toggle online to receive rides"}
+            </p>
+          </div>
+
+          {/* Online toggle */}
+          <button onClick={() => {
+            setIsOnline(!isOnline);
+            if (!isOnline) setTimeout(() => { setDriverStep("request"); setTimer(15); }, 2000);
+          }} style={{
+            width: "100%", padding: 20, marginBottom: 20,
+            background: isOnline ? `linear-gradient(135deg, ${COLORS.danger}, #FF6B6B)` : `linear-gradient(135deg, ${COLORS.success}, #00C853)`,
+            border: "none", borderRadius: 16, color: "white", fontSize: 18, fontWeight: 700,
+            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+          }}>
+            <Zap size={22} />
+            {isOnline ? "GO OFFLINE" : "GO ONLINE"}
+          </button>
+
+          {isOnline && (
+            <MapSimulation pickup={null} drop={null} showDriver={false} style={{ marginBottom: 16, height: 160 }} />
+          )}
+
+          {/* Earnings */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
+            <StatCard icon={IndianRupee} label="Today" value={`₹${earnings.today.toLocaleString()}`} color={COLORS.success} />
+            <StatCard icon={Car} label="Today's Trips" value={earnings.trips} color={COLORS.cyan} />
+            <StatCard icon={TrendingUp} label="This Week" value={`₹${earnings.week.toLocaleString()}`} color={COLORS.warning} />
+            <StatCard icon={BarChart3} label="This Month" value={`₹${earnings.month.toLocaleString()}`} color="#7B61FF" />
+          </div>
+
+          {/* Trip History */}
+          <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 16, border: `1px solid ${COLORS.cyan}10` }}>
+            <div style={{ color: COLORS.white, fontWeight: 600, marginBottom: 12 }}>Today's Trips</div>
+            {[
+              { from: "Saket", to: "CP", fare: 320, time: "9:15 AM", rating: 5 },
+              { from: "Dwarka", to: "Janakpuri", fare: 180, time: "10:30 AM", rating: 4 },
+              { from: "GK", to: "Nehru Place", fare: 210, time: "11:45 AM", rating: 5 },
+            ].map((t, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < 2 ? `1px solid ${COLORS.gray}10` : "none" }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: `${COLORS.cyan}12`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Navigation size={16} color={COLORS.cyan} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: COLORS.white, fontSize: 13 }}>{t.from} → {t.to}</div>
+                  <div style={{ color: COLORS.gray, fontSize: 11 }}>{t.time}</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ color: COLORS.success, fontWeight: 600, fontSize: 14 }}>₹{t.fare}</div>
+                  <div style={{ display: "flex", gap: 1 }}>
+                    {[1, 2, 3, 4, 5].map(s => <Star key={s} size={9} fill={s <= t.rating ? COLORS.warning : "none"} color={COLORS.warning} />)}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* RIDE REQUEST */}
+      {driverStep === "request" && (
+        <div style={{ textAlign: "center" }}>
+          <div style={{
+            width: 100, height: 100, borderRadius: "50%", margin: "20px auto 24px",
+            background: `conic-gradient(${COLORS.cyan} ${(timer / 15) * 360}deg, ${COLORS.cardBg} 0deg)`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 4,
+          }}>
+            <div style={{
+              width: "100%", height: "100%", borderRadius: "50%", background: COLORS.darkBg,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              flexDirection: "column",
+            }}>
+              <span style={{ color: COLORS.cyan, fontSize: 28, fontWeight: 800 }}>{timer}s</span>
+            </div>
+          </div>
+
+          <h3 style={{ color: COLORS.white, fontSize: 20, margin: "0 0 6px" }}>New Ride Request! </h3>
+          <p style={{ color: COLORS.gray, fontSize: 13, margin: "0 0 20px" }}>Accept before timer expires</p>
+
+          <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 18, marginBottom: 16, textAlign: "left", border: `1px solid ${COLORS.cyan}15` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+              <div style={{ width: 42, height: 42, borderRadius: "50%", background: `${COLORS.cyan}15`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <User size={20} color={COLORS.cyan} />
+              </div>
+              <div>
+                <div style={{ color: COLORS.white, fontWeight: 600 }}>Ananya Sharma</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <Star size={12} fill={COLORS.warning} color={COLORS.warning} />
+                  <span style={{ color: COLORS.warning, fontSize: 12 }}>4.9</span>
+                </div>
+              </div>
+              <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                <div style={{ color: COLORS.success, fontWeight: 700, fontSize: 20 }}>₹285</div>
+                <div style={{ color: COLORS.gray, fontSize: 11 }}>9.3 km</div>
+              </div>
+            </div>
+            <div style={{ padding: 12, background: COLORS.cardBg2, borderRadius: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <CircleDot size={12} color={COLORS.success} />
+                <span style={{ color: COLORS.grayLight, fontSize: 13 }}>Connaught Place</span>
+              </div>
+              <div style={{ width: 1, height: 10, background: `${COLORS.gray}30`, marginLeft: 6 }} />
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Target size={12} color={COLORS.danger} />
+                <span style={{ color: COLORS.grayLight, fontSize: 13 }}>Hauz Khas Village</span>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 12 }}>
+            <button onClick={() => { setDriverStep("home"); setIsOnline(true); }} style={{
+              flex: 1, padding: 16, background: `${COLORS.danger}20`, border: `2px solid ${COLORS.danger}`,
+              borderRadius: 14, color: COLORS.danger, fontSize: 15, fontWeight: 700, cursor: "pointer",
+            }}>
+              ✕ Decline
+            </button>
+            <button onClick={() => setDriverStep("navigating")} style={{
+              flex: 2, padding: 16,
+              background: `linear-gradient(135deg, ${COLORS.success}, #00C853)`,
+              border: "none", borderRadius: 14, color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer",
+            }}>
+              ✓ Accept Ride
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* NAVIGATING TO PICKUP */}
+      {driverStep === "navigating" && (
+        <>
+          <div style={{
+            background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.cyan})`,
+            borderRadius: 16, padding: 20, marginBottom: 16, textAlign: "center",
+          }}>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", marginBottom: 4 }}>Navigate to pickup</div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: "white" }}>Connaught Place</div>
+            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", marginTop: 4 }}>3 min · 1.2 km away</div>
+          </div>
+
+          <MapSimulation pickup="Connaught Place" drop="Hauz Khas" showDriver driverPos={20} style={{ marginBottom: 16 }} />
+
+          <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 16, marginBottom: 12, border: `1px solid ${COLORS.cyan}10` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 42, height: 42, borderRadius: "50%", background: `${COLORS.cyan}15`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <User size={20} color={COLORS.cyan} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ color: COLORS.white, fontWeight: 600 }}>Ananya Sharma</div>
+                <div style={{ color: COLORS.gray, fontSize: 12 }}>Rider · ⭐ 4.9</div>
+              </div>
+              <button style={{ width: 40, height: 40, borderRadius: "50%", background: `${COLORS.success}15`, border: `1px solid ${COLORS.success}30`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <Phone size={16} color={COLORS.success} />
+              </button>
+              <button style={{ width: 40, height: 40, borderRadius: "50%", background: `${COLORS.cyan}15`, border: `1px solid ${COLORS.cyan}30`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <MessageSquare size={16} color={COLORS.cyan} />
+              </button>
+            </div>
+          </div>
+
+          <button onClick={() => { setTripProgress(0); setDriverStep("trip"); }} style={{
+            width: "100%", padding: 16,
+            background: `linear-gradient(135deg, ${COLORS.success}, #00C853)`,
+            border: "none", borderRadius: 14, color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer",
+          }}>
+            ▶ Start Trip — Rider Picked Up
+          </button>
+        </>
+      )}
+
+      {/* ON TRIP */}
+      {driverStep === "trip" && (
+        <>
+          <div style={{
+            background: `linear-gradient(135deg, ${COLORS.warning}20, ${COLORS.warning}05)`,
+            border: `1px solid ${COLORS.warning}30`,
+            borderRadius: 16, padding: 16, marginBottom: 16, textAlign: "center",
+          }}>
+            <div style={{ color: COLORS.warning, fontSize: 12, marginBottom: 2 }}> Trip In Progress</div>
+            <div style={{ color: COLORS.white, fontSize: 22, fontWeight: 700 }}>Hauz Khas Village</div>
+            <div style={{ height: 6, background: COLORS.cardBg, borderRadius: 3, marginTop: 10, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${tripProgress}%`, background: `linear-gradient(90deg, ${COLORS.warning}, ${COLORS.success})`, borderRadius: 3, transition: "width 0.3s" }} />
+            </div>
+            <div style={{ color: COLORS.gray, fontSize: 11, marginTop: 6 }}>{tripProgress}% complete · {Math.max(1, Math.round((100 - tripProgress) / 12))} min left</div>
+          </div>
+
+          <MapSimulation pickup="CP" drop="Hauz Khas" showDriver driverPos={tripProgress} style={{ marginBottom: 16, height: 200 }} />
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 16 }}>
+            <div style={{ background: COLORS.cardBg, borderRadius: 12, padding: 12, textAlign: "center" }}>
+              <div style={{ color: COLORS.cyan, fontSize: 18, fontWeight: 700 }}>₹285</div>
+              <div style={{ color: COLORS.gray, fontSize: 10 }}>Fare</div>
+            </div>
+            <div style={{ background: COLORS.cardBg, borderRadius: 12, padding: 12, textAlign: "center" }}>
+              <div style={{ color: COLORS.white, fontSize: 18, fontWeight: 700 }}>9.3 km</div>
+              <div style={{ color: COLORS.gray, fontSize: 10 }}>Distance</div>
+            </div>
+            <div style={{ background: COLORS.cardBg, borderRadius: 12, padding: 12, textAlign: "center" }}>
+              <div style={{ color: COLORS.success, fontSize: 18, fontWeight: 700 }}>₹228</div>
+              <div style={{ color: COLORS.gray, fontSize: 10 }}>Your Earning</div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* COMPLETE */}
+      {driverStep === "complete" && (
+        <div style={{ textAlign: "center", padding: "20px 0" }}>
+          <div style={{
+            width: 80, height: 80, borderRadius: "50%", margin: "0 auto 20px",
+            background: `linear-gradient(135deg, ${COLORS.success}, #00C853)`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <Check size={40} color="white" />
+          </div>
+          <h2 style={{ color: COLORS.white, margin: "0 0 6px" }}>Trip Complete! 🎉</h2>
+
+          <div style={{
+            background: COLORS.cardBg, borderRadius: 20, padding: 24, margin: "20px 0",
+            border: `1px solid ${COLORS.success}20`,
+          }}>
+            <div style={{ fontSize: 14, color: COLORS.gray, marginBottom: 4 }}>You Earned</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: COLORS.success }}>₹228</div>
+            <div style={{ fontSize: 12, color: COLORS.gray, marginTop: 4 }}>Total fare: ₹285 · Commission: 20%</div>
+            <div style={{ borderTop: `1px solid ${COLORS.gray}15`, marginTop: 16, paddingTop: 16, display: "flex", justifyContent: "space-around" }}>
+              <div><div style={{ color: COLORS.white, fontWeight: 600 }}>9.3 km</div><div style={{ color: COLORS.gray, fontSize: 11 }}>Distance</div></div>
+              <div><div style={{ color: COLORS.white, fontWeight: 600 }}>14 min</div><div style={{ color: COLORS.gray, fontSize: 11 }}>Duration</div></div>
+              <div>
+                <div style={{ display: "flex", gap: 1, justifyContent: "center" }}>
+                  {[1, 2, 3, 4, 5].map(s => <Star key={s} size={12} fill={COLORS.warning} color={COLORS.warning} />)}
+                </div>
+                <div style={{ color: COLORS.gray, fontSize: 11 }}>Rating</div>
+              </div>
+            </div>
+          </div>
+
+          <button onClick={() => { setDriverStep("home"); setIsOnline(true); }} style={{
+            width: "100%", padding: 16,
+            background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.cyan})`,
+            border: "none", borderRadius: 14, color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer",
+          }}>
+            Continue Driving
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============ ADMIN DASHBOARD ============
+const AdminDashboard = () => {
+  const [adminTab, setAdminTab] = useState("overview");
+  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [pricing, setPricing] = useState({ baseFare: 40, perKm: 12, perMin: 2, surge: 1.0 });
+
+  const tabs = [
+    { id: "overview", icon: Activity, label: "Overview" },
+    { id: "rides", icon: Car, label: "Rides" },
+    { id: "drivers", icon: Users, label: "Drivers" },
+    { id: "pricing", icon: IndianRupee, label: "Pricing" },
+    { id: "reports", icon: BarChart3, label: "Reports" },
+  ];
+
+  return (
+    <div style={{ minHeight: "100%", display: "flex", flexDirection: "column" }}>
+      {/* Header */}
+      <div style={{ padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `1px solid ${COLORS.cyan}10` }}>
+        <MoveoLogo size={28} light />
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ color: COLORS.gray, fontSize: 12 }}>Admin Panel</span>
+          <div style={{ width: 34, height: 34, borderRadius: 8, background: `${COLORS.danger}20`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Shield size={16} color={COLORS.danger} />
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: 2, padding: "10px 16px", overflowX: "auto" }}>
+        {tabs.map(tab => (
+          <button key={tab.id} onClick={() => setAdminTab(tab.id)} style={{
+            display: "flex", alignItems: "center", gap: 6, padding: "8px 14px",
+            borderRadius: 10, border: "none", cursor: "pointer", whiteSpace: "nowrap",
+            background: adminTab === tab.id ? `${COLORS.cyan}15` : "transparent",
+            color: adminTab === tab.id ? COLORS.cyan : COLORS.gray,
+            fontSize: 12, fontWeight: adminTab === tab.id ? 600 : 400,
+          }}>
+            <tab.icon size={14} />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ flex: 1, padding: "12px 16px", overflowY: "auto" }}>
+        {/* OVERVIEW */}
+        {adminTab === "overview" && (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
+              <StatCard icon={Car} label="Today's Rides" value="463" trend={12} color={COLORS.cyan} />
+              <StatCard icon={IndianRupee} label="Revenue" value="₹68.4K" trend={8} color={COLORS.success} />
+              <StatCard icon={Users} label="Active Drivers" value="127" trend={-3} color="#7B61FF" />
+              <StatCard icon={User} label="Active Riders" value="2,847" trend={15} color={COLORS.warning} />
+            </div>
+
+            {/* Revenue Chart */}
+            <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 16, marginBottom: 16, border: `1px solid ${COLORS.cyan}10` }}>
+              <div style={{ color: COLORS.white, fontWeight: 600, marginBottom: 14 }}>Weekly Revenue</div>
+              <ResponsiveContainer width="100%" height={180}>
+                <AreaChart data={revenueData}>
+                  <defs>
+                    <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={COLORS.cyan} stopOpacity={0.3} />
+                      <stop offset="100%" stopColor={COLORS.cyan} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="day" tick={{ fill: COLORS.gray, fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: COLORS.gray, fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ background: COLORS.cardBg2, border: `1px solid ${COLORS.cyan}20`, borderRadius: 10, color: COLORS.white, fontSize: 12 }} />
+                  <Area type="monotone" dataKey="revenue" stroke={COLORS.cyan} fill="url(#revGrad)" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Vehicle Distribution */}
+            <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 16, border: `1px solid ${COLORS.cyan}10` }}>
+              <div style={{ color: COLORS.white, fontWeight: 600, marginBottom: 14 }}>Ride Distribution</div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <ResponsiveContainer width="50%" height={140}>
+                  <PieChart>
+                    <Pie data={vehicleDistData} innerRadius={35} outerRadius={60} dataKey="value" stroke="none">
+                      {vehicleDistData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div style={{ flex: 1 }}>
+                  {vehicleDistData.map(v => (
+                    <div key={v.name} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <div style={{ width: 10, height: 10, borderRadius: 3, background: v.color }} />
+                      <span style={{ color: COLORS.grayLight, fontSize: 12, flex: 1 }}>{v.name}</span>
+                      <span style={{ color: COLORS.white, fontSize: 12, fontWeight: 600 }}>{v.value}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Live Rides */}
+            <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 16, marginTop: 16, border: `1px solid ${COLORS.cyan}10` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <span style={{ color: COLORS.white, fontWeight: 600 }}>Live Rides</span>
+                <span style={{
+                  background: `${COLORS.success}20`, color: COLORS.success, padding: "3px 10px",
+                  borderRadius: 20, fontSize: 11, fontWeight: 600, display: "flex", alignItems: "center", gap: 4,
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: COLORS.success, animation: "pulse 1.5s infinite" }} />
+                  23 Active
+                </span>
+              </div>
+              <MapSimulation pickup="Various" drop="Locations" showDriver driverPos={50} style={{ height: 150 }} />
+            </div>
+          </>
+        )}
+
+        {/* RIDES */}
+        {adminTab === "rides" && (
+          <>
+            <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+              {["all", "completed", "in_progress", "cancelled"].map(f => (
+                <button key={f} style={{
+                  padding: "6px 12px", borderRadius: 8, border: `1px solid ${COLORS.cyan}15`,
+                  background: f === "all" ? `${COLORS.cyan}15` : "transparent",
+                  color: f === "all" ? COLORS.cyan : COLORS.gray, fontSize: 11, cursor: "pointer",
+                  textTransform: "capitalize",
+                }}>
+                  {f === "all" ? "All" : f.replace("_", " ")}
+                </button>
+              ))}
+            </div>
+            {MOCK_RIDES.map(ride => (
+              <div key={ride.id} style={{
+                background: COLORS.cardBg, borderRadius: 14, padding: 14, marginBottom: 10,
+                border: `1px solid ${COLORS.cyan}08`,
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                  <span style={{ color: COLORS.cyan, fontSize: 12, fontWeight: 600 }}>{ride.id}</span>
+                  <StatusBadge status={ride.status} />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <CircleDot size={10} color={COLORS.success} />
+                  <span style={{ color: COLORS.grayLight, fontSize: 12 }}>{ride.from}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                  <Target size={10} color={COLORS.danger} />
+                  <span style={{ color: COLORS.grayLight, fontSize: 12 }}>{ride.to}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 10, borderTop: `1px solid ${COLORS.gray}10`, fontSize: 11 }}>
+                  <span style={{ color: COLORS.gray }}> {ride.rider}</span>
+                  <span style={{ color: COLORS.gray }}> {ride.driver || "—"}</span>
+                  <span style={{ color: COLORS.gray }}>{ride.vehicle} · {ride.distance}</span>
+                  <span style={{ color: COLORS.success, fontWeight: 600 }}>₹{ride.fare}</span>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* DRIVERS */}
+        {adminTab === "drivers" && (
+          <>
+            {selectedDriver ? (
+              <>
+                <button onClick={() => setSelectedDriver(null)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: COLORS.cyan, cursor: "pointer", marginBottom: 16, fontSize: 13 }}>
+                  <ArrowLeft size={14} /> Back to Drivers
+                </button>
+                <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 20, border: `1px solid ${COLORS.cyan}10` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
+                    <div style={{ width: 56, height: 56, borderRadius: "50%", background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.cyan})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <User size={26} color="white" />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ color: COLORS.white, fontWeight: 700, fontSize: 18 }}>{selectedDriver.name}</div>
+                      <div style={{ color: COLORS.gray, fontSize: 12 }}>{selectedDriver.phone}</div>
+                    </div>
+                    <StatusBadge status={selectedDriver.status} />
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
+                    <div style={{ background: COLORS.cardBg2, borderRadius: 12, padding: 12 }}>
+                      <div style={{ color: COLORS.gray, fontSize: 11 }}>Rating</div>
+                      <div style={{ color: COLORS.warning, fontSize: 20, fontWeight: 700 }}>⭐ {selectedDriver.rating}</div>
+                    </div>
+                    <div style={{ background: COLORS.cardBg2, borderRadius: 12, padding: 12 }}>
+                      <div style={{ color: COLORS.gray, fontSize: 11 }}>Total Rides</div>
+                      <div style={{ color: COLORS.white, fontSize: 20, fontWeight: 700 }}>{selectedDriver.rides}</div>
+                    </div>
+                    <div style={{ background: COLORS.cardBg2, borderRadius: 12, padding: 12 }}>
+                      <div style={{ color: COLORS.gray, fontSize: 11 }}>Earnings</div>
+                      <div style={{ color: COLORS.success, fontSize: 20, fontWeight: 700 }}>₹{selectedDriver.earnings.toLocaleString()}</div>
+                    </div>
+                    <div style={{ background: COLORS.cardBg2, borderRadius: 12, padding: 12 }}>
+                      <div style={{ color: COLORS.gray, fontSize: 11 }}>Vehicle</div>
+                      <div style={{ color: COLORS.white, fontSize: 14, fontWeight: 600 }}>{selectedDriver.vehicle}</div>
+                      <div style={{ color: COLORS.gray, fontSize: 11 }}>{selectedDriver.plate}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button style={{ flex: 1, padding: 12, background: selectedDriver.verified ? `${COLORS.success}15` : `${COLORS.warning}15`, border: `1px solid ${selectedDriver.verified ? COLORS.success : COLORS.warning}30`, borderRadius: 10, color: selectedDriver.verified ? COLORS.success : COLORS.warning, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                      {selectedDriver.verified ? "✓ Verified" : "⚠ Verify Driver"}
+                    </button>
+                    <button style={{ flex: 1, padding: 12, background: `${COLORS.danger}15`, border: `1px solid ${COLORS.danger}30`, borderRadius: 10, color: COLORS.danger, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                      Block Driver
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <span style={{ color: COLORS.white, fontWeight: 600, fontSize: 16 }}>All Drivers ({MOCK_DRIVERS.length})</span>
+                </div>
+                {MOCK_DRIVERS.map(d => (
+                  <button key={d.id} onClick={() => setSelectedDriver(d)} style={{
+                    width: "100%", display: "flex", alignItems: "center", gap: 12,
+                    padding: 14, marginBottom: 8, borderRadius: 14, cursor: "pointer",
+                    background: COLORS.cardBg, border: `1px solid ${COLORS.cyan}08`, textAlign: "left",
+                  }}>
+                    <div style={{ width: 42, height: 42, borderRadius: "50%", background: `linear-gradient(135deg, ${COLORS.primary}AA, ${COLORS.cyan}AA)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <User size={18} color="white" />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ color: COLORS.white, fontWeight: 600, fontSize: 13 }}>{d.name}</div>
+                      <div style={{ color: COLORS.gray, fontSize: 11 }}>{d.vehicle} · ⭐ {d.rating} · {d.rides} rides</div>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                      <StatusBadge status={d.status} />
+                      {!d.verified && <StatusBadge status="pending" />}
+                    </div>
+                  </button>
+                ))}
+              </>
+            )}
+          </>
+        )}
+
+        {/* PRICING */}
+        {adminTab === "pricing" && (
+          <>
+            <h3 style={{ color: COLORS.white, fontSize: 18, fontWeight: 700, margin: "0 0 16px" }}>Pricing Rules</h3>
+            <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 18, marginBottom: 16, border: `1px solid ${COLORS.cyan}10` }}>
+              {[
+                { label: "Base Fare", key: "baseFare", unit: "₹", min: 10, max: 100 },
+                { label: "Per Kilometer", key: "perKm", unit: "₹/km", min: 5, max: 50 },
+                { label: "Per Minute", key: "perMin", unit: "₹/min", min: 1, max: 10 },
+              ].map(item => (
+                <div key={item.key} style={{ marginBottom: 18 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                    <span style={{ color: COLORS.grayLight, fontSize: 13 }}>{item.label}</span>
+                    <span style={{ color: COLORS.cyan, fontWeight: 700, fontSize: 16 }}>{item.unit === "₹" ? "₹" : ""}{pricing[item.key]}{item.unit !== "₹" ? ` ${item.unit}` : ""}</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <button onClick={() => setPricing({ ...pricing, [item.key]: Math.max(item.min, pricing[item.key] - 1) })} style={{ width: 32, height: 32, borderRadius: 8, background: `${COLORS.cyan}12`, border: `1px solid ${COLORS.cyan}20`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                      <Minus size={14} color={COLORS.cyan} />
+                    </button>
+                    <div style={{ flex: 1, height: 6, background: COLORS.cardBg2, borderRadius: 3, position: "relative", overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${((pricing[item.key] - item.min) / (item.max - item.min)) * 100}%`, background: `linear-gradient(90deg, ${COLORS.primary}, ${COLORS.cyan})`, borderRadius: 3 }} />
+                    </div>
+                    <button onClick={() => setPricing({ ...pricing, [item.key]: Math.min(item.max, pricing[item.key] + 1) })} style={{ width: 32, height: 32, borderRadius: 8, background: `${COLORS.cyan}12`, border: `1px solid ${COLORS.cyan}20`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                      <Plus size={14} color={COLORS.cyan} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Surge */}
+            <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 18, marginBottom: 16, border: `1px solid ${COLORS.warning}20` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                <Zap size={16} color={COLORS.warning} />
+                <span style={{ color: COLORS.white, fontWeight: 600 }}>Surge Pricing</span>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                {[1.0, 1.25, 1.5, 1.75, 2.0].map(s => (
+                  <button key={s} onClick={() => setPricing({ ...pricing, surge: s })} style={{
+                    flex: 1, padding: "10px 0", borderRadius: 10, cursor: "pointer",
+                    background: pricing.surge === s ? `${COLORS.warning}20` : COLORS.cardBg2,
+                    border: pricing.surge === s ? `2px solid ${COLORS.warning}` : `1px solid ${COLORS.gray}15`,
+                    color: pricing.surge === s ? COLORS.warning : COLORS.gray, fontSize: 13, fontWeight: 600,
+                  }}>
+                    {s}x
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Fare preview */}
+            <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 18, border: `1px solid ${COLORS.cyan}10` }}>
+              <div style={{ color: COLORS.white, fontWeight: 600, marginBottom: 12 }}>Fare Preview (10 km, 20 min)</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                {VEHICLES.map(v => {
+                  const est = Math.round((pricing.baseFare + pricing.perKm * 10 + pricing.perMin * 20) * pricing.surge * (v.rate / 12));
+                  return (
+                    <div key={v.id} style={{ background: COLORS.cardBg2, borderRadius: 12, padding: 12, display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 22 }}>{v.icon}</span>
+                      <div>
+                        <div style={{ color: COLORS.white, fontSize: 12, fontWeight: 600 }}>{v.name}</div>
+                        <div style={{ color: COLORS.cyan, fontSize: 16, fontWeight: 700 }}>₹{est}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* REPORTS */}
+        {adminTab === "reports" && (
+          <>
+            <h3 style={{ color: COLORS.white, fontSize: 18, fontWeight: 700, margin: "0 0 16px" }}>Analytics & Reports</h3>
+
+            {/* Hourly Chart */}
+            <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 16, marginBottom: 16, border: `1px solid ${COLORS.cyan}10` }}>
+              <div style={{ color: COLORS.white, fontWeight: 600, marginBottom: 12 }}>Rides by Hour (Today)</div>
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={hourlyData}>
+                  <XAxis dataKey="hour" tick={{ fill: COLORS.gray, fontSize: 9 }} axisLine={false} tickLine={false} interval={3} />
+                  <YAxis tick={{ fill: COLORS.gray, fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ background: COLORS.cardBg2, border: `1px solid ${COLORS.cyan}20`, borderRadius: 10, color: COLORS.white, fontSize: 12 }} />
+                  <Bar dataKey="rides" fill={COLORS.cyan} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Revenue vs Rides */}
+            <div style={{ background: COLORS.cardBg, borderRadius: 16, padding: 16, marginBottom: 16, border: `1px solid ${COLORS.cyan}10` }}>
+              <div style={{ color: COLORS.white, fontWeight: 600, marginBottom: 12 }}>Revenue vs Rides (Weekly)</div>
+              <ResponsiveContainer width="100%" height={160}>
+                <LineChart data={revenueData}>
+                  <XAxis dataKey="day" tick={{ fill: COLORS.gray, fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis yAxisId="rev" tick={{ fill: COLORS.gray, fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis yAxisId="rides" orientation="right" tick={{ fill: COLORS.gray, fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ background: COLORS.cardBg2, border: `1px solid ${COLORS.cyan}20`, borderRadius: 10, color: COLORS.white, fontSize: 12 }} />
+                  <Line yAxisId="rev" type="monotone" dataKey="revenue" stroke={COLORS.cyan} strokeWidth={2} dot={false} />
+                  <Line yAxisId="rides" type="monotone" dataKey="rides" stroke={COLORS.warning} strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+              <div style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 12, height: 3, background: COLORS.cyan, borderRadius: 2 }} /><span style={{ color: COLORS.gray, fontSize: 11 }}>Revenue</span></div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 12, height: 3, background: COLORS.warning, borderRadius: 2 }} /><span style={{ color: COLORS.gray, fontSize: 11 }}>Rides</span></div>
+              </div>
+            </div>
+
+            {/* Key metrics */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <StatCard icon={TrendingUp} label="Avg Fare" value="₹247" color={COLORS.cyan} />
+              <StatCard icon={Clock} label="Avg Duration" value="18 min" color={COLORS.warning} />
+              <StatCard icon={Star} label="Avg Rating" value="4.6 ⭐" color={COLORS.warning} />
+              <StatCard icon={XCircle} label="Cancel Rate" value="8.2%" color={COLORS.danger} />
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============ MAIN APP ============
+export default function MoveoApp() {
+  const [activeApp, setActiveApp] = useState("landing"); // landing, rider, driver, admin
+
+  if (activeApp === "landing") {
+    return (
+      <div style={{
+        minHeight: "100vh", background: COLORS.darkBg,
+        fontFamily: "'Poppins', 'Segoe UI', sans-serif",
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        padding: 24, position: "relative", overflow: "hidden",
+      }}>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+        <style>{`
+          @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+          @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+          @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+          @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          ::-webkit-scrollbar { width: 4px; }
+          ::-webkit-scrollbar-track { background: transparent; }
+          ::-webkit-scrollbar-thumb { background: ${COLORS.cyan}30; border-radius: 4px; }
+        `}</style>
+
+        {/* Background effects */}
+        <div style={{ position: "absolute", top: -100, right: -100, width: 400, height: 400, borderRadius: "50%", background: `radial-gradient(circle, ${COLORS.primary}15 0%, transparent 70%)` }} />
+        <div style={{ position: "absolute", bottom: -100, left: -100, width: 300, height: 300, borderRadius: "50%", background: `radial-gradient(circle, ${COLORS.cyan}10 0%, transparent 70%)` }} />
+
+        <div style={{ animation: "float 3s ease-in-out infinite", marginBottom: 32 }}>
+          <MoveoLogo size={64} light />
+        </div>
+
+        <p style={{ color: COLORS.gray, fontSize: 16, marginBottom: 48, textAlign: "center", maxWidth: 320 }}>
+          Delhi's smartest ride-hailing platform. Fast, safe, affordable.
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, width: "100%", maxWidth: 340 }}>
+          {[
+            { id: "rider", label: "Rider App", desc: "Book rides across Delhi", color: COLORS.cyan },
+            { id: "driver", label: "Driver App", desc: "Accept rides & earn money", color: COLORS.success },
+            { id: "admin", label: "Admin Dashboard", desc: "Manage everything", color: COLORS.danger },
+          ].map((app, i) => (
+            <button key={app.id} onClick={() => setActiveApp(app.id)} style={{
+              width: "100%", padding: "18px 20px", borderRadius: 16,
+              background: COLORS.cardBg, border: `1px solid ${app.color}20`,
+              cursor: "pointer", display: "flex", alignItems: "center", gap: 16,
+              textAlign: "left", transition: "all 0.3s",
+              animation: `fadeUp 0.5s ease ${i * 0.15}s both`,
+            }}
+              onMouseEnter={e => { e.currentTarget.style.border = `1px solid ${app.color}60`; e.currentTarget.style.transform = "translateX(4px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.border = `1px solid ${app.color}20`; e.currentTarget.style.transform = "translateX(0)"; }}
+            >
+              <span style={{ fontSize: 32 }}>{app.icon}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ color: COLORS.white, fontWeight: 700, fontSize: 16 }}>{app.label}</div>
+                <div style={{ color: COLORS.gray, fontSize: 12 }}>{app.desc}</div>
+              </div>
+              <ChevronRight size={20} color={app.color} />
+            </button>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 48, display: "flex", gap: 20, color: COLORS.gray, fontSize: 11 }}>
+          <span> Delhi NCR</span>
+          <span> Secure</span>
+          <span> Real-time</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      minHeight: "100vh", background: COLORS.darkBg,
+      fontFamily: "'Poppins', 'Segoe UI', sans-serif",
+      maxWidth: activeApp === "admin" ? 800 : 420,
+      margin: "0 auto",
+    }}>
+      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+      <style>{`
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } }
+        @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: ${COLORS.cyan}30; border-radius: 4px; }
+        input::placeholder { color: ${COLORS.gray}; }
+      `}</style>
+
+      {/* Back to Landing */}
+      <button onClick={() => setActiveApp("landing")} style={{
+        position: "fixed", top: 12, left: 12, zIndex: 100,
+        background: `${COLORS.cardBg}DD`, backdropFilter: "blur(10px)",
+        border: `1px solid ${COLORS.cyan}20`, borderRadius: 10,
+        padding: "6px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+        color: COLORS.cyan, fontSize: 11, fontWeight: 600,
+      }}>
+        <ArrowLeft size={12} /> Switch App
+      </button>
+
+      {activeApp === "rider" && <RiderApp />}
+      {activeApp === "driver" && <DriverApp />}
+      {activeApp === "admin" && <AdminDashboard />}
+    </div>
+  );
+}
