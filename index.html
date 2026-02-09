@@ -3,1215 +3,216 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MOVEO — Ride Hailing App</title>
+<title>MOVEO — Premium Ride Hailing</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230A1AFF'/><text x='50' y='68' font-size='60' text-anchor='middle' fill='white' font-weight='bold'>M</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-  :root {
-    --primary: #0A1AFF;
-    --primary-dark: #0815CC;
-    --cyan: #00E5FF;
-    --dark: #0B0B0B;
-    --dark-bg: #080C24;
-    --card-bg: #0E1438;
-    --card-bg2: #131A4A;
-    --white: #FFFFFF;
-    --gray: #8892B0;
-    --gray-light: #CCD6F6;
-    --success: #00E676;
-    --warning: #FFD600;
-    --danger: #FF1744;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Poppins', 'Segoe UI', sans-serif;
-    background: var(--dark-bg);
-    color: var(--white);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-  button { font-family: inherit; }
-  input { font-family: inherit; }
-
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(0,229,255,0.2); border-radius: 4px; }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.05); }
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-  @keyframes slideInLeft {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(0); }
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes countDown {
-    from { stroke-dashoffset: 0; }
-    to { stroke-dashoffset: 283; }
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  .app-container { max-width: 440px; margin: 0 auto; min-height: 100vh; position: relative; }
-  .app-container.admin { max-width: 820px; }
-
-  .btn {
-    border: none; cursor: pointer; border-radius: 14px; font-weight: 700;
-    font-size: 15px; padding: 16px; width: 100%; display: flex;
-    align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;
-  }
-  .btn-primary { background: linear-gradient(135deg, var(--primary), var(--cyan)); color: white; }
-  .btn-success { background: linear-gradient(135deg, var(--success), #00C853); color: white; }
-  .btn-danger-outline { background: rgba(255,23,68,0.12); border: 2px solid var(--danger); color: var(--danger); }
-  .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
-  .btn-sm { padding: 10px 16px; font-size: 13px; width: auto; border-radius: 10px; }
-  .btn-icon {
-    width: 40px; height: 40px; border-radius: 10px; border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; background: rgba(0,229,255,0.08);
-  }
-
-  .card {
-    background: var(--card-bg); border-radius: 16px; padding: 18px;
-    border: 1px solid rgba(0,229,255,0.06); margin-bottom: 12px;
-  }
-
-  .badge {
-    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
-    display: inline-flex; align-items: center; gap: 4px;
-  }
-  .badge::before {
-    content: ''; width: 6px; height: 6px; border-radius: 50%; display: inline-block;
-  }
-  .badge-online { background: rgba(0,230,118,0.13); color: var(--success); }
-  .badge-online::before { background: var(--success); }
-  .badge-offline { background: rgba(255,23,68,0.13); color: var(--danger); }
-  .badge-offline::before { background: var(--danger); }
-  .badge-onride { background: rgba(255,214,0,0.13); color: var(--warning); }
-  .badge-onride::before { background: var(--warning); }
-  .badge-completed { background: rgba(0,230,118,0.13); color: var(--success); }
-  .badge-completed::before { background: var(--success); }
-  .badge-inprogress { background: rgba(0,229,255,0.13); color: var(--cyan); }
-  .badge-inprogress::before { background: var(--cyan); }
-  .badge-cancelled { background: rgba(255,23,68,0.13); color: var(--danger); }
-  .badge-cancelled::before { background: var(--danger); }
-  .badge-pending { background: rgba(255,214,0,0.13); color: var(--warning); }
-  .badge-pending::before { background: var(--warning); }
-  .stat-card {
-    background: var(--card-bg); border-radius: 16px; padding: 20px 22px;
-    position: relative; overflow: hidden;
-  }
-  .stat-card .bg-circle {
-    position: absolute; top: -20px; right: -20px; width: 80px; height: 80px;
-    border-radius: 50%; opacity: 0.08;
-  }
-  .stat-card .stat-icon {
-    width: 38px; height: 38px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .stat-card .stat-value { font-size: 26px; font-weight: 700; margin-top: 12px; }
-  .stat-card .stat-sub { font-size: 12px; color: var(--gray); margin-top: 4px; }
-  .stat-card .stat-trend { font-size: 11px; margin-top: 4px; font-weight: 600; }
-
-  .sim-map {
-    background: #0a1628; border-radius: 16px; position: relative;
-    overflow: hidden; border: 1px solid rgba(0,229,255,0.06);
-  }
-  .sim-map .grid-h, .sim-map .grid-v {
-    position: absolute; background: rgba(0,229,255,0.04);
-  }
-  .sim-map .grid-h { left: 0; right: 0; height: 1px; }
-  .sim-map .grid-v { top: 0; bottom: 0; width: 1px; }
-  .sim-map .road-h { position: absolute; left: 0; right: 0; background: rgba(136,146,176,0.15); }
-  .sim-map .road-v { position: absolute; top: 0; bottom: 0; background: rgba(136,146,176,0.15); }
-  .sim-map .map-label {
-    position: absolute; bottom: 10px; left: 12px;
-    background: rgba(8,12,36,0.8); backdrop-filter: blur(8px);
-    padding: 6px 12px; border-radius: 8px; font-size: 11px; color: var(--gray);
-    display: flex; align-items: center; gap: 6px;
-  }
-  .sim-map .marker {
-    position: absolute; display: flex; flex-direction: column; align-items: center;
-  }
-  .sim-map .marker-dot {
-    width: 32px; height: 32px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; font-size: 14px;
-  }
-  .sim-map .marker-label { font-size: 10px; margin-top: 4px; font-weight: 600; white-space: nowrap; }
-  .sim-map .driver-marker {
-    position: absolute; transition: all 1s ease;
-  }
-  .sim-map .driver-dot {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--cyan));
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 25px rgba(0,229,255,0.35); animation: pulse 2s infinite;
-    font-size: 16px;
-  }
-
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-  .flex-center { display: flex; align-items: center; justify-content: center; }
-  .flex-between { display: flex; align-items: center; justify-content: space-between; }
-
-
-  .progress-bar { height: 6px; background: var(--card-bg2); border-radius: 3px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
-
- 
-  .input-field {
-    width: 100%; padding: 10px 14px; background: var(--card-bg2);
-    border: 1px solid rgba(0,229,255,0.08); border-radius: 10px;
-    color: var(--white); font-size: 13px; outline: none;
-  }
-  .input-field::placeholder { color: var(--gray); }
-  .input-field:focus { border-color: rgba(0,229,255,0.3); }
-
-
-  .menu-overlay {
-    position: fixed; inset: 0; z-index: 100; display: flex;
-  }
-  .menu-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.7); }
-  .menu-panel {
-    position: relative; z-index: 1; width: 270px; background: var(--dark-bg);
-    padding: 24px; height: 100%; animation: slideInLeft 0.3s ease;
-    overflow-y: auto;
-  }
-  .menu-item {
-    display: flex; align-items: center; gap: 14px; width: 100%;
-    padding: 14px 0; border: none; background: none; cursor: pointer;
-    border-bottom: 1px solid rgba(136,146,176,0.08); color: var(--gray-light); font-size: 14px;
-  }
-
- 
-  .suggestions {
-    position: absolute; top: 100%; left: 0; right: 0;
-    background: var(--card-bg2); border-radius: 0 0 10px 10px;
-    z-index: 10; border: 1px solid rgba(0,229,255,0.08); border-top: none;
-  }
-  .suggestion-item {
-    display: flex; align-items: center; gap: 8px; width: 100%;
-    padding: 10px 14px; background: none; border: none;
-    border-bottom: 1px solid rgba(136,146,176,0.05); cursor: pointer; text-align: left;
-    color: var(--gray-light); font-size: 12px;
-  }
-  .suggestion-item:hover { background: rgba(0,229,255,0.05); }
-
-  .vehicle-option {
-    width: 100%; display: flex; align-items: center; gap: 14px;
-    padding: 14px; margin-bottom: 8px; border-radius: 14px; cursor: pointer;
-    background: var(--card-bg); border: 1px solid rgba(0,229,255,0.06);
-    text-align: left; transition: all 0.2s;
-  }
-  .vehicle-option.selected {
-    background: rgba(0,229,255,0.08); border: 2px solid var(--cyan);
-  }
-  .vehicle-option:hover { border-color: rgba(0,229,255,0.3); }
-
- 
-  .star-btn { background: none; border: none; cursor: pointer; transition: transform 0.2s; padding: 2px; }
-  .star-btn.active { transform: scale(1.2); }
-
- 
-  .tab-btn {
-    display: flex; align-items: center; gap: 6px; padding: 8px 14px;
-    border-radius: 10px; border: none; cursor: pointer; white-space: nowrap;
-    font-size: 12px; font-weight: 400; background: transparent; color: var(--gray);
-    transition: all 0.2s;
-  }
-  .tab-btn.active { background: rgba(0,229,255,0.1); color: var(--cyan); font-weight: 600; }
-
-
-  .ride-card {
-    background: var(--card-bg); border-radius: 14px; padding: 14px;
-    margin-bottom: 10px; border: 1px solid rgba(0,229,255,0.04);
-  }
-
- 
-  .driver-item {
-    width: 100%; display: flex; align-items: center; gap: 12px;
-    padding: 14px; margin-bottom: 8px; border-radius: 14px; cursor: pointer;
-    background: var(--card-bg); border: 1px solid rgba(0,229,255,0.04);
-    text-align: left; transition: all 0.2s;
-  }
-  .driver-item:hover { border-color: rgba(0,229,255,0.2); }
-
-
-  .pay-opt {
-    flex: 1; padding: 8px 0; border-radius: 10px; cursor: pointer;
-    font-size: 12px; color: var(--white); text-align: center;
-    background: var(--card-bg2); border: 1px solid rgba(136,146,176,0.1);
-    transition: all 0.2s;
-  }
-  .pay-opt.active { background: rgba(0,229,255,0.08); border: 2px solid var(--cyan); }
-
-  
-  .filter-btn {
-    padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 11px;
-    text-transform: capitalize; background: transparent;
-    border: 1px solid rgba(0,229,255,0.08); color: var(--gray);
-    transition: all 0.2s;
-  }
-  .filter-btn.active { background: rgba(0,229,255,0.1); color: var(--cyan); }
-
-  
-  .surge-btn {
-    flex: 1; padding: 10px 0; border-radius: 10px; cursor: pointer;
-    font-size: 13px; font-weight: 600;
-    background: var(--card-bg2); border: 1px solid rgba(136,146,176,0.08);
-    color: var(--gray); transition: all 0.2s;
-  }
-  .surge-btn.active { background: rgba(255,214,0,0.12); border: 2px solid var(--warning); color: var(--warning); }
-
- 
-  .landing {
-    min-height: 100vh; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; padding: 24px;
-    position: relative; overflow: hidden;
-  }
-  .landing .bg-orb1 {
-    position: absolute; top: -100px; right: -100px; width: 400px; height: 400px;
-    border-radius: 50%; background: radial-gradient(circle, rgba(10,26,255,0.1) 0%, transparent 70%);
-  }
-  .landing .bg-orb2 {
-    position: absolute; bottom: -100px; left: -100px; width: 300px; height: 300px;
-    border-radius: 50%; background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%);
-  }
-  .landing-card {
-    width: 100%; max-width: 340px; padding: 18px 20px; border-radius: 16px;
-    background: var(--card-bg); cursor: pointer; display: flex;
-    align-items: center; gap: 16px; text-align: left; transition: all 0.3s;
-    border: 1px solid transparent; margin-bottom: 14px;
-  }
-  .landing-card:hover { transform: translateX(4px); }
-
-  
-  .switch-btn {
-    position: fixed; top: 12px; left: 12px; z-index: 90;
-    background: rgba(14,20,56,0.9); backdrop-filter: blur(10px);
-    border: 1px solid rgba(0,229,255,0.15); border-radius: 10px;
-    padding: 6px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px;
-    color: var(--cyan); font-size: 11px; font-weight: 600;
-  }
-
-  .hidden { display: none !important; }
-
-
-  .chart-container { position: relative; width: 100%; }
+:root{--pri:#0A1AFF;--cyan:#00E5FF;--dark:#070B1E;--card:#0C1132;--card2:#101845;--cb:rgba(0,229,255,0.05);--wh:#F0F4FF;--gr:#6B7599;--grl:#A8B2D1;--ok:#00E676;--warn:#FFD600;--err:#FF3D57;--r:14px;--rs:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--wh);min-height:100vh;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Outfit',sans-serif}button,input{font-family:inherit}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,229,255,0.12);border-radius:3px}
+.ico svg{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideL{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(0,229,255,.15)}50%{box-shadow:0 0 40px rgba(0,229,255,.3)}}
+.ctr{max-width:440px;margin:0 auto;min-height:100vh;position:relative}.ctr.w{max-width:860px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.fx{display:flex;align-items:center}.fxb{display:flex;align-items:center;justify-content:space-between}
+.card{background:var(--card);border-radius:var(--r);padding:18px;border:1px solid var(--cb);margin-bottom:12px}
+.btn{border:none;cursor:pointer;border-radius:var(--r);font-weight:700;font-size:15px;padding:16px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .25s;letter-spacing:.3px}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.1)}.btn:active{transform:translateY(0)}
+.bp{background:linear-gradient(135deg,var(--pri),#1E40FF);color:#fff;box-shadow:0 4px 20px rgba(10,26,255,.3)}
+.bc{background:linear-gradient(135deg,var(--pri),var(--cyan));color:#fff;box-shadow:0 4px 20px rgba(0,229,255,.2)}
+.bs{background:linear-gradient(135deg,#00C853,var(--ok));color:#fff;box-shadow:0 4px 20px rgba(0,230,118,.2)}
+.bdo{background:rgba(255,61,87,.08);border:1.5px solid rgba(255,61,87,.4);color:var(--err)}
+.bsm{padding:10px 16px;font-size:13px;width:auto;border-radius:var(--rs);font-weight:600}
+.bi{width:42px;height:42px;border-radius:var(--rs);border:1px solid var(--cb);cursor:pointer;display:flex;align-items:center;justify-content:center;background:var(--card);color:var(--grl);transition:all .2s;font-size:16px}
+.bi:hover{border-color:rgba(0,229,255,.2);color:var(--cyan)}
+.bdg{padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:5px;letter-spacing:.5px;text-transform:uppercase}
+.bdg i{width:6px;height:6px;border-radius:50%;display:inline-block}
+.b-online{background:rgba(0,230,118,.1);color:var(--ok)}.b-online i{background:var(--ok)}
+.b-offline{background:rgba(255,61,87,.1);color:var(--err)}.b-offline i{background:var(--err)}
+.b-on_ride,.b-in_progress{background:rgba(0,229,255,.1);color:var(--cyan)}.b-on_ride i,.b-in_progress i{background:var(--cyan)}
+.b-completed{background:rgba(0,230,118,.1);color:var(--ok)}.b-completed i{background:var(--ok)}
+.b-cancelled{background:rgba(255,61,87,.1);color:var(--err)}.b-cancelled i{background:var(--err)}
+.b-pending{background:rgba(255,214,0,.1);color:var(--warn)}.b-pending i{background:var(--warn)}
+.inp{width:100%;padding:12px 16px;background:var(--card2);border:1px solid rgba(0,229,255,.06);border-radius:var(--rs);color:var(--wh);font-size:13px;outline:none;transition:border .2s}
+.inp::placeholder{color:var(--gr)}.inp:focus{border-color:rgba(0,229,255,.25)}
+.prg{height:5px;background:var(--card2);border-radius:3px;overflow:hidden}.prg-bar{height:100%;border-radius:3px;transition:width .3s}
+.stat{background:var(--card);border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden;border:1px solid var(--cb)}
+.stat .orb{position:absolute;top:-16px;right:-16px;width:64px;height:64px;border-radius:50%;opacity:.06}
+.map{background:linear-gradient(145deg,#060E28,#0A1335);border-radius:var(--r);position:relative;overflow:hidden;border:1px solid var(--cb)}
+.map .gl{position:absolute;background:rgba(0,229,255,.025)}.map .rd{position:absolute;background:rgba(107,117,153,.1)}
+.map .lb{position:absolute;bottom:10px;left:12px;background:rgba(7,11,30,.85);backdrop-filter:blur(10px);padding:6px 14px;border-radius:8px;font-size:10px;color:var(--gr);letter-spacing:.5px;text-transform:uppercase;font-weight:600;border:1px solid rgba(0,229,255,.06)}
+.map .mk{position:absolute;display:flex;flex-direction:column;align-items:center}.map .mk span{font-size:9px;margin-top:4px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.map .md{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.dp{position:absolute;transition:all .8s ease}.dd{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--cyan));display:flex;align-items:center;justify-content:center;animation:glow 2s infinite;color:#fff}
+.ov{position:fixed;inset:0;z-index:100;display:flex}.ovb{position:absolute;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px)}
+.sp{position:relative;z-index:1;width:280px;background:var(--dark);padding:28px 24px;height:100%;animation:slideL .25s ease;border-right:1px solid var(--cb);overflow-y:auto}
+.mi{display:flex;align-items:center;gap:14px;width:100%;padding:14px 0;border:none;background:none;cursor:pointer;border-bottom:1px solid rgba(107,117,153,.06);color:var(--grl);font-size:14px;transition:color .2s}.mi:hover{color:var(--cyan)}
+.sgs{position:absolute;top:100%;left:0;right:0;background:var(--card2);border-radius:0 0 var(--rs) var(--rs);z-index:10;border:1px solid rgba(0,229,255,.06);border-top:none;box-shadow:0 12px 32px rgba(0,0,0,.4)}
+.sgi{display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;background:none;border:none;border-bottom:1px solid rgba(107,117,153,.04);cursor:pointer;text-align:left;color:var(--grl);font-size:12px;transition:all .15s}.sgi:hover{background:rgba(0,229,255,.04);color:var(--wh)}
+.vo{width:100%;display:flex;align-items:center;gap:16px;padding:16px;margin-bottom:8px;border-radius:var(--r);cursor:pointer;background:var(--card);border:1.5px solid var(--cb);text-align:left;transition:all .2s}
+.vo:hover{border-color:rgba(0,229,255,.15)}.vo.sel{background:rgba(0,229,255,.06);border-color:var(--cyan)}
+.vi{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--cyan);background:rgba(0,229,255,.06)}
+.pb{flex:1;padding:10px 0;border-radius:var(--rs);cursor:pointer;font-size:12px;font-weight:600;color:var(--grl);text-align:center;background:var(--card2);border:1.5px solid rgba(107,117,153,.08);transition:all .2s}
+.pb.a{background:rgba(0,229,255,.06);border-color:var(--cyan);color:var(--cyan)}
+.tab{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rs);border:none;cursor:pointer;white-space:nowrap;font-size:12px;font-weight:500;background:transparent;color:var(--gr);transition:all .2s;letter-spacing:.3px}
+.tab.a{background:rgba(0,229,255,.08);color:var(--cyan);font-weight:700}
+.fb{padding:7px 14px;border-radius:8px;cursor:pointer;font-size:11px;text-transform:capitalize;background:transparent;font-weight:600;border:1px solid rgba(0,229,255,.06);color:var(--gr);transition:all .2s;letter-spacing:.3px}
+.fb.a{background:rgba(0,229,255,.08);color:var(--cyan);border-color:rgba(0,229,255,.2)}
+.sb{flex:1;padding:10px 0;border-radius:var(--rs);cursor:pointer;font-size:13px;font-weight:700;background:var(--card2);border:1.5px solid rgba(107,117,153,.06);color:var(--gr);transition:all .2s}
+.sb.a{background:rgba(255,214,0,.08);border-color:var(--warn);color:var(--warn)}
+.sr{background:none;border:none;cursor:pointer;padding:2px;font-size:32px;transition:transform .15s;color:var(--gr);line-height:1}.sr.on{color:var(--warn);transform:scale(1.15)}
+.dc{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;margin-bottom:8px;border-radius:var(--r);cursor:pointer;background:var(--card);border:1px solid var(--cb);text-align:left;transition:all .2s}.dc:hover{border-color:rgba(0,229,255,.15)}
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--pri),var(--cyan));color:#fff;flex-shrink:0}
+.sw{position:fixed;top:14px;left:14px;z-index:90;background:rgba(12,17,50,.92);backdrop-filter:blur(12px);border:1px solid rgba(0,229,255,.1);border-radius:var(--rs);padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--cyan);font-size:11px;font-weight:700;letter-spacing:.3px;transition:all .2s}
+.sw:hover{border-color:rgba(0,229,255,.3)}
+.ld{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;position:relative;overflow:hidden}
+.ldc{width:100%;max-width:360px;padding:20px 22px;border-radius:var(--r);background:var(--card);cursor:pointer;display:flex;align-items:center;gap:18px;text-align:left;transition:all .3s ease;border:1px solid var(--cb);margin-bottom:12px}
+.ldc:hover{transform:translateX(6px);border-color:rgba(0,229,255,.15)}
+.ldi{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hid{display:none!important}
 </style>
 </head>
 <body>
+<svg style="display:none"><defs>
+<symbol id="i-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+<symbol id="i-al" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+<symbol id="i-ar" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+<symbol id="i-cr" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-tgt" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+<symbol id="i-clk" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+<symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17h14v-5l-2-6H7L5 12z"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/></symbol>
+<symbol id="i-usr" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+<symbol id="i-ph" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.11 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></symbol>
+<symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></symbol>
+<symbol id="i-sh" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+<symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+<symbol id="i-chk" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+<symbol id="i-act" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+<symbol id="i-bar" viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></symbol>
+<symbol id="i-trd" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
+<symbol id="i-dlr" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></symbol>
+<symbol id="i-hm" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></symbol>
+<symbol id="i-wal" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 010-4h14v4"/><path d="M3 5v14a2 2 0 002 2h16v-5"/><path d="M18 12a2 2 0 100 4h4v-4z"/></symbol>
+<symbol id="i-set" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-2.82 1.18V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1.08-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1.08H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68V3a2 2 0 014 0v.09c.04.68.49 1.25 1.14 1.45.65.2 1.36.03 1.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.2.65.77 1.1 1.45 1.14H21a2 2 0 010 4h-.09c-.68.04-1.25.49-1.45 1.14z"/></symbol>
+<symbol id="i-awd" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></symbol>
+<symbol id="i-cc" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></symbol>
+<symbol id="i-min" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+<symbol id="i-pls" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+<symbol id="i-nav" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></symbol>
+<symbol id="i-xc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></symbol>
+<symbol id="i-usrs" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></symbol>
+</defs></svg>
 
-
-<div id="landing" class="landing">
-  <div class="bg-orb1"></div>
-  <div class="bg-orb2"></div>
-
-  <div style="animation: float 3s ease-in-out infinite; margin-bottom: 32px;">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div style="width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(0,229,255,0.2);">
-        <svg width="42" height="42" viewBox="0 0 40 40" fill="none"><path d="M5 32L13 8L20 22L27 8L35 32" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 22L20 32" stroke="#00E5FF" stroke-width="2.5" stroke-linecap="round"/><circle cx="20" cy="7" r="2" fill="#00E5FF"/></svg>
-      </div>
-      <span style="font-size:35px;font-weight:800;letter-spacing:3px;color:white;">MOVEO</span>
-    </div>
-  </div>
-
-  <p style="color:var(--gray);font-size:16px;margin-bottom:48px;text-align:center;max-width:320px;">
-    Delhi's smartest ride-hailing platform. Fast, safe, affordable.
-  </p>
-
-  <div style="display:flex;flex-direction:column;width:100%;max-width:340px;">
-    <div class="landing-card" onclick="openApp('rider')" style="animation:fadeUp 0.5s ease 0s both;border-color:rgba(0,229,255,0.12);">
-      <span style="font-size:32px;"></span>
-      <div style="flex:1;"><div style="font-weight:700;font-size:16px;">Rider App</div><div style="color:var(--gray);font-size:12px;">Book rides across Delhi</div></div>
-      <span style="color:var(--cyan);font-size:20px;">›</span>
-    </div>
-    <div class="landing-card" onclick="openApp('driver')" style="animation:fadeUp 0.5s ease 0.15s both;border-color:rgba(0,230,118,0.12);">
-      <span style="font-size:32px;"></span>
-      <div style="flex:1;"><div style="font-weight:700;font-size:16px;">Driver App</div><div style="color:var(--gray);font-size:12px;">Accept rides & earn money</div></div>
-      <span style="color:var(--success);font-size:20px;">›</span>
-    </div>
-    <div class="landing-card" onclick="openApp('admin')" style="animation:fadeUp 0.5s ease 0.3s both;border-color:rgba(255,23,68,0.12);">
-      <span style="font-size:32px;"></span>
-      <div style="flex:1;"><div style="font-weight:700;font-size:16px;">Admin Dashboard</div><div style="color:var(--gray);font-size:12px;">Manage everything</div></div>
-      <span style="color:var(--danger);font-size:20px;">›</span>
-    </div>
-  </div>
-
-  <div style="margin-top:48px;display:flex;gap:20px;color:var(--gray);font-size:11px;">
-    <span> Delhi NCR</span><span> Secure</span><span></span> Real-time</span>
-  </div>
+<!-- LANDING -->
+<div id="pL" class="ld">
+<div style="position:absolute;top:-120px;right:-120px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(10,26,255,.1),transparent 70%);pointer-events:none"></div>
+<div style="position:absolute;bottom:-80px;left:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,.06),transparent 70%);pointer-events:none"></div>
+<div style="animation:float 4s ease-in-out infinite;margin-bottom:36px"><div class="fx" style="gap:12px"><div style="width:60px;height:60px;border-radius:14px;background:linear-gradient(135deg,var(--pri),var(--cyan));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,229,255,.2)"><svg width="38" height="38" viewBox="0 0 40 40" fill="none"><path d="M5 32L13 8L20 22L27 8L35 32" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 22L20 32" stroke="#00E5FF" stroke-width="2.5" stroke-linecap="round"/><circle cx="20" cy="7" r="2" fill="#00E5FF"/></svg></div><span style="font-family:'Outfit';font-size:38px;font-weight:900;letter-spacing:4px">MOVEO</span></div></div>
+<p style="color:var(--gr);font-size:15px;margin-bottom:48px;text-align:center;max-width:300px;line-height:1.6">Delhi's smartest ride-hailing platform.<br>Fast. Safe. Affordable.</p>
+<div style="display:flex;flex-direction:column;width:100%;max-width:360px">
+<div class="ldc" onclick="go('rider')" style="animation:fadeUp .5s ease 0s both"><div class="ldi" style="background:rgba(0,229,255,.08)"><svg width="24" height="24" style="stroke:var(--cyan);fill:none;stroke-width:2"><use href="#i-usr"/></svg></div><div style="flex:1"><div style="font-family:'Outfit';font-weight:700;font-size:16px">Rider App</div><div style="color:var(--gr);font-size:12px;margin-top:2px">Book rides across Delhi</div></div><svg width="18" height="18" style="stroke:var(--gr);fill:none;stroke-width:2"><use href="#i-cr"/></svg></div>
+<div class="ldc" onclick="go('driver')" style="animation:fadeUp .5s ease .12s both"><div class="ldi" style="background:rgba(0,230,118,.08)"><svg width="24" height="24" style="stroke:var(--ok);fill:none;stroke-width:2"><use href="#i-car"/></svg></div><div style="flex:1"><div style="font-family:'Outfit';font-weight:700;font-size:16px">Driver App</div><div style="color:var(--gr);font-size:12px;margin-top:2px">Accept rides & earn money</div></div><svg width="18" height="18" style="stroke:var(--gr);fill:none;stroke-width:2"><use href="#i-cr"/></svg></div>
+<div class="ldc" onclick="go('admin')" style="animation:fadeUp .5s ease .24s both"><div class="ldi" style="background:rgba(255,61,87,.08)"><svg width="24" height="24" style="stroke:var(--err);fill:none;stroke-width:2"><use href="#i-sh"/></svg></div><div style="flex:1"><div style="font-family:'Outfit';font-weight:700;font-size:16px">Admin Dashboard</div><div style="color:var(--gr);font-size:12px;margin-top:2px">Manage everything</div></div><svg width="18" height="18" style="stroke:var(--gr);fill:none;stroke-width:2"><use href="#i-cr"/></svg></div>
+</div>
+<div style="margin-top:52px;display:flex;gap:28px;color:var(--gr);font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:600"><span>Delhi NCR</span><span style="opacity:.3">|</span><span>Encrypted</span><span style="opacity:.3">|</span><span>Real-time</span></div>
 </div>
 
-
-<div id="rider-app" class="app-container hidden">
-  <button class="switch-btn" onclick="openApp('landing')">← Switch App</button>
-
- 
-  <div id="rider-menu" class="menu-overlay hidden">
-    <div class="menu-backdrop" onclick="toggleMenu(false)"></div>
-    <div class="menu-panel">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:30px;">
-        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:20px;">👤</div>
-        <div><div style="font-weight:600;font-size:15px;">ANEEK</div><div style="color:var(--gray);font-size:12px;">+91 99999 99999</div></div>
-      </div>
-      <button class="menu-item" onclick="riderGo('home');toggleMenu(false);"> &nbsp; Home</button>
-      <button class="menu-item" onclick="showRideHistory();toggleMenu(false);"> &nbsp; Ride History</button>
-      <button class="menu-item"> &nbsp; Wallet: ₹2,450</button>
-      <button class="menu-item"> &nbsp; Payment Methods</button>
-      <button class="menu-item"> &nbsp; Rewards</button>
-      <button class="menu-item"> &nbsp; Settings</button>
-      <button class="menu-item"> &nbsp; Safety</button>
-    </div>
-  </div>
-
- 
-  <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
-    <button class="btn-icon" onclick="toggleMenu(true)">☰</button>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;">
-        <svg width="20" height="20" viewBox="0 0 40 40" fill="none"><path d="M5 32L13 8L20 22L27 8L35 32" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <span style="font-size:16px;font-weight:800;letter-spacing:2px;">MOVEO</span>
-    </div>
-    <button class="btn-icon" style="position:relative;"><span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--danger);"></span></button>
-  </div>
-
-  <div style="padding:0 20px 20px;" id="rider-content"></div>
+<!-- RIDER -->
+<div id="pR" class="ctr hid">
+<button class="sw" onclick="go('landing')"><svg width="14" height="14" style="stroke:currentColor;fill:none;stroke-width:2"><use href="#i-al"/></svg>Switch</button>
+<div id="rM" class="ov hid"><div class="ovb" onclick="tm(0)"></div><div class="sp">
+<div class="fx" style="gap:12px;margin-bottom:28px"><div class="av" style="width:48px;height:48px"><svg width="22" height="22" style="stroke:#fff;fill:none;stroke-width:2"><use href="#i-usr"/></svg></div><div><div style="font-weight:700;font-size:15px">Debarghya</div><div style="color:var(--gr);font-size:12px">+91 99999 99999</div></div></div>
+<button class="mi" onclick="rg('home');tm(0)"><svg width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2"><use href="#i-hm"/></svg>Home</button>
+<button class="mi" onclick="rh();tm(0)"><svg width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2"><use href="#i-clk"/></svg>Ride History</button>
+<button class="mi"><svg width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2"><use href="#i-wal"/></svg>Wallet — ₹2,450</button>
+<button class="mi"><svg width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2"><use href="#i-cc"/></svg>Payment Methods</button>
+<button class="mi"><svg width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2"><use href="#i-awd"/></svg>Rewards</button>
+<button class="mi"><svg width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2"><use href="#i-set"/></svg>Settings</button>
+<button class="mi"><svg width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2"><use href="#i-sh"/></svg>Safety</button>
+</div></div>
+<div style="padding:16px 20px" class="fxb">
+<button class="bi" onclick="tm(1)"><svg width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2"><use href="#i-menu"/></svg></button>
+<div class="fx" style="gap:8px"><div style="width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--pri),var(--cyan));display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 40 40" fill="none"><path d="M5 32L13 8L20 22L27 8L35 32" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span style="font-family:'Outfit';font-size:15px;font-weight:800;letter-spacing:2px">MOVEO</span></div>
+<button class="bi" style="position:relative"><svg width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2"><use href="#i-bell"/></svg><span style="position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--err)"></span></button>
+</div>
+<div style="padding:0 20px 24px" id="rC"></div>
 </div>
 
+<!-- DRIVER -->
+<div id="pD" class="ctr hid"><button class="sw" onclick="go('landing')"><svg width="14" height="14" style="stroke:currentColor;fill:none;stroke-width:2"><use href="#i-al"/></svg>Switch</button><div style="padding:20px" id="dC"></div></div>
 
-<div id="driver-app" class="app-container hidden">
-  <button class="switch-btn" onclick="openApp('landing')">← Switch App</button>
-  <div style="padding:20px;" id="driver-content"></div>
-</div>
-
-
-<div id="admin-app" class="app-container admin hidden">
-  <button class="switch-btn" onclick="openApp('landing')">← Switch App</button>
-
-  <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,229,255,0.06);">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;">
-        <svg width="18" height="18" viewBox="0 0 40 40" fill="none"><path d="M5 32L13 8L20 22L27 8L35 32" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <span style="font-size:15px;font-weight:800;letter-spacing:2px;">MOVEO</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span style="color:var(--gray);font-size:12px;">Admin Panel</span>
-      <div style="width:34px;height:34px;border-radius:8px;background:rgba(255,23,68,0.12);display:flex;align-items:center;justify-content:center;">🛡️</div>
-    </div>
-  </div>
-  
-  <div style="display:flex;gap:2px;padding:10px 16px;overflow-x:auto;" id="admin-tabs"></div>
-  <div style="padding:12px 16px;" id="admin-content"></div>
+<!-- ADMIN -->
+<div id="pA" class="ctr w hid"><button class="sw" onclick="go('landing')"><svg width="14" height="14" style="stroke:currentColor;fill:none;stroke-width:2"><use href="#i-al"/></svg>Switch</button>
+<div style="padding:16px 20px" class="fxb"><div class="fx" style="gap:8px"><div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--pri),var(--cyan));display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 40 40" fill="none"><path d="M5 32L13 8L20 22L27 8L35 32" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span style="font-family:'Outfit';font-size:15px;font-weight:800;letter-spacing:2px">MOVEO</span></div><div class="fx" style="gap:8px"><span style="color:var(--gr);font-size:12px;font-weight:600;letter-spacing:.5px">ADMIN</span><div style="width:34px;height:34px;border-radius:8px;background:rgba(255,61,87,.08);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" style="stroke:var(--err);fill:none;stroke-width:2"><use href="#i-sh"/></svg></div></div></div>
+<div style="display:flex;gap:2px;padding:10px 16px;overflow-x:auto;border-bottom:1px solid var(--cb)" id="aT"></div>
+<div style="padding:16px 20px" id="aC"></div>
 </div>
 
 <script>
-=
-const VEHICLES = [
-  { id:"bike", name:"Bike", icon:"🏍️", rate:7, base:25, eta:"2 min", desc:"Quick & affordable" },
-  { id:"mini", name:"Mini", icon:"🚗", rate:12, base:40, eta:"4 min", desc:"Compact sedan" },
-  { id:"sedan", name:"Sedan", icon:"🚘", rate:16, base:50, eta:"5 min", desc:"Comfortable ride" },
-  { id:"suv", name:"SUV", icon:"🚙", rate:22, base:80, eta:"7 min", desc:"Spacious & premium" },
-];
-
-const DELHI_PLACES = [
-  "Connaught Place","India Gate","Hauz Khas","Saket","Lajpat Nagar",
-  "Karol Bagh","Dwarka Sec-21","Rohini Sec-3","Vasant Kunj","Nehru Place",
-  "Rajouri Garden","Chandni Chowk","Preet Vihar","Janakpuri","Greater Kailash"
-];
-
-const MOCK_DRIVERS = [
-  { id:1, name:"Rajesh Kumar", phone:"+91 98765 43210", vehicle:"Swift Dzire", plate:"DL 01 AB 1234", rating:4.8, rides:1247, status:"online", verified:true, earnings:32500 },
-  { id:2, name:"Amit Singh", phone:"+91 87654 32109", vehicle:"WagonR", plate:"DL 02 CD 5678", rating:4.6, rides:892, status:"on_ride", verified:true, earnings:28700 },
-  { id:3, name:"Suresh Yadav", phone:"+91 76543 21098", vehicle:"Alto 800", plate:"DL 03 EF 9012", rating:4.3, rides:456, status:"offline", verified:true, earnings:15200 },
-  { id:4, name:"Vikram Sharma", phone:"+91 65432 10987", vehicle:"Ertiga", plate:"DL 04 GH 3456", rating:4.9, rides:2103, status:"online", verified:true, earnings:54800 },
-  { id:5, name:"Deepak Verma", phone:"+91 54321 09876", vehicle:"Honda Activa", plate:"DL 05 IJ 7890", rating:4.1, rides:234, status:"offline", verified:false, earnings:8900 },
-  { id:6, name:"Manoj Tiwari", phone:"+91 43210 98765", vehicle:"Creta", plate:"DL 06 KL 2345", rating:4.7, rides:1567, status:"online", verified:true, earnings:41200 },
-];
-
-const MOCK_RIDES = [
-  { id:"MV-1001", rider:"Ananya S.", driver:"Rajesh Kumar", from:"Connaught Place", to:"Hauz Khas", fare:245, status:"completed", time:"10:34 AM", vehicle:"Sedan", distance:"8.2 km" },
-  { id:"MV-1002", rider:"Priya M.", driver:"Amit Singh", from:"Saket", to:"India Gate", fare:180, status:"in_progress", time:"11:02 AM", vehicle:"Mini", distance:"6.1 km" },
-  { id:"MV-1003", rider:"Rohit K.", driver:"Vikram Sharma", from:"Dwarka", to:"Nehru Place", fare:420, status:"completed", time:"09:15 AM", vehicle:"SUV", distance:"18.5 km" },
-  { id:"MV-1004", rider:"Sneha L.", driver:null, from:"Rohini", to:"Rajouri Garden", fare:110, status:"cancelled", time:"09:45 AM", vehicle:"Bike", distance:"4.3 km" },
-  { id:"MV-1005", rider:"Karan J.", driver:"Manoj Tiwari", from:"Vasant Kunj", to:"Chandni Chowk", fare:380, status:"completed", time:"08:20 AM", vehicle:"Sedan", distance:"15.8 km" },
-];
-
-const RIDE_HISTORY = [
-  { from:"Connaught Place", to:"Hauz Khas", fare:245, date:"Today", rating:5, driver:"Rajesh K." },
-  { from:"Saket", to:"India Gate", fare:180, date:"Yesterday", rating:4, driver:"Amit S." },
-  { from:"Dwarka", to:"Nehru Place", fare:420, date:"2 days ago", rating:5, driver:"Vikram S." },
-];
-
-const revenueData = {
-  labels: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
-  revenue: [45000,52000,48000,61000,73000,82000,67000],
-  rides: [320,380,350,420,510,580,460],
-};
-
-
-let state = {
-  rider: { step:"home", pickup:"", drop:"", selectedVehicle:null, driverPos:0, rating:0, payment:"cash" },
-  driver: { step:"home", isOnline:false, timer:15, tripProgress:0 },
-  admin: { tab:"overview", selectedDriver:null, pricing:{ baseFare:40, perKm:12, perMin:2, surge:1.0 } },
-};
-
-let intervals = {};
-
-
-function badge(status) {
-  const map = { online:"Online", offline:"Offline", on_ride:"On Ride", completed:"Completed", in_progress:"In Progress", cancelled:"Cancelled", pending:"Pending" };
-  const cls = status.replace("_","");
-  return `<span class="badge badge-${cls}">${map[status]||status}</span>`;
-}
-
-function stars(n, size=12) {
-  return Array.from({length:5}, (_,i) =>
-    `<span style="color:${i<n?'var(--warning)':'var(--gray)'};font-size:${size}px;">${i<n?'★':'☆'}</span>`
-  ).join('');
-}
-
-function mapHTML(h=280, pickup=null, drop=null, showDriver=false, driverPos=30) {
-  let grids = '';
-  for(let i=1;i<=10;i++) grids += `<div class="grid-h" style="top:${i*9}%"></div>`;
-  for(let i=1;i<=14;i++) grids += `<div class="grid-v" style="left:${i*7}%"></div>`;
-
-  let markers = '';
-  if(pickup) markers += `<div class="marker" style="left:65px;top:${h*0.59}px;"><div class="marker-dot" style="background:var(--success);box-shadow:0 0 20px rgba(0,230,118,0.3);">📍</div><span class="marker-label" style="color:var(--success);">${pickup}</span></div>`;
-  if(drop) markers += `<div class="marker" style="right:40px;top:${h*0.17}px;"><div class="marker-dot" style="background:var(--danger);box-shadow:0 0 20px rgba(255,23,68,0.3);">🎯</div><span class="marker-label" style="color:var(--danger);">${drop}</span></div>`;
-  if(showDriver) markers += `<div class="driver-marker" id="driver-marker" style="left:${20+driverPos*0.5}%;top:${55-driverPos*0.2}%;"><div class="driver-dot">🚗</div></div>`;
-
-  return `<div class="sim-map" style="height:${h}px;">
-    ${grids}
-    <div class="road-h" style="top:40%;height:3px;"></div>
-    <div class="road-h" style="top:65%;height:2px;"></div>
-    <div class="road-v" style="left:30%;width:3px;"></div>
-    <div class="road-v" style="left:70%;width:2px;"></div>
-    <svg style="position:absolute;inset:0;width:100%;height:100%;"><path d="M 80 ${h*0.64} Q 150 ${h*0.36} 200 ${h*0.43} T 320 ${h*0.29}" stroke="var(--cyan)" stroke-width="3" fill="none" stroke-dasharray="8 4" opacity="0.6"/></svg>
-    ${markers}
-    <div class="map-label"> Delhi NCR — Live Map</div>
-  </div>`;
-}
-
-function statCard(icon, label, value, color='var(--cyan)', trend=null) {
-  let trendHTML = '';
-  if(trend !== null) trendHTML = `<div class="stat-trend" style="color:${trend>0?'var(--success)':'var(--danger)'};">${trend>0?'↑':'↓'} ${Math.abs(trend)}% vs last week</div>`;
-  return `<div class="stat-card">
-    <div class="bg-circle" style="background:${color};"></div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-      <div class="stat-icon" style="background:${color}18;">${icon}</div>
-      <span style="color:var(--gray);font-size:13px;">${label}</span>
-    </div>
-    <div class="stat-value">${value}</div>
-    ${trendHTML}
-  </div>`;
-}
-
-
-function openApp(app) {
-  clearAllIntervals();
-  document.querySelectorAll('#landing, #rider-app, #driver-app, #admin-app').forEach(el => el.classList.add('hidden'));
-  if(app === 'landing') { document.getElementById('landing').classList.remove('hidden'); return; }
-  document.getElementById(app+'-app').classList.remove('hidden');
-  if(app === 'rider') renderRider();
-  if(app === 'driver') renderDriver();
-  if(app === 'admin') renderAdmin();
-}
-
-function clearAllIntervals() {
-  Object.values(intervals).forEach(id => clearInterval(id));
-  intervals = {};
-}
-
-
-function toggleMenu(show) {
-  document.getElementById('rider-menu').classList.toggle('hidden', !show);
-}
-
-function riderGo(step) {
-  clearAllIntervals();
-  state.rider.step = step;
-  renderRider();
-}
-
-function showRideHistory() {
-  const c = document.getElementById('rider-content');
-  let html = `<div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
-    <button class="btn-icon" onclick="riderGo('home')">←</button>
-    <span style="font-size:20px;font-weight:700;">Ride History</span>
-  </div>`;
-  RIDE_HISTORY.forEach(r => {
-    html += `<div class="card">
-      <div class="flex-between" style="margin-bottom:10px;"><span style="color:var(--gray);font-size:12px;">${r.date}</span><span style="color:var(--success);font-weight:700;">₹${r.fare}</span></div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="color:var(--success);font-size:12px;">📍</span><span style="font-size:13px;">${r.from}</span></div>
-      <div style="width:1px;height:12px;background:var(--gray);margin-left:6px;opacity:0.3;"></div>
-      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--danger);font-size:12px;">🎯</span><span style="font-size:13px;">${r.to}</span></div>
-      <div class="flex-between" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(136,146,176,0.1);">
-        <span style="color:var(--gray);font-size:12px;">Driver: ${r.driver}</span>
-        <div>${stars(r.rating)}</div>
-      </div>
-    </div>`;
-  });
-  c.innerHTML = html;
-}
-
-function renderRider() {
-  const c = document.getElementById('rider-content');
-  const s = state.rider;
-  const distance = (s.pickup && s.drop) ? (Math.random()*15+3).toFixed(1) : 0;
-  const fare = s.selectedVehicle ? Math.round(s.selectedVehicle.base + s.selectedVehicle.rate * distance) : 0;
-
-  
-  s._distance = distance;
-  s._fare = fare;
-
-  let html = '';
-
-  
-  if(s.step === 'home') {
-    html = `
-      <div style="margin-bottom:20px;">
-        <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">Where to? </h2>
-        <p style="color:var(--gray);font-size:13px;">Book a ride across Delhi</p>
-      </div>
-      ${mapHTML(200)}
-      <div style="display:flex;gap:10px;margin:20px 0;overflow-x:auto;padding-bottom:4px;">
-        ${[" Home"," Office"," Market"," Hospital"].map(q =>
-          `<button style="background:var(--card-bg2);border:1px solid rgba(0,229,255,0.08);border-radius:12px;padding:10px 16px;color:var(--gray-light);font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0;" onclick="state.rider.pickup='My Location';state.rider.drop='${q.split(' ')[1]}';riderGo('booking');">${q}</button>`
-        ).join('')}
-      </div>
-      <button onclick="riderGo('booking')" style="width:100%;padding:16px 18px;background:var(--card-bg);border:1px solid rgba(0,229,255,0.12);border-radius:14px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;">
-        <span style="color:var(--gray);font-size:16px;"></span>
-        <span style="color:var(--gray);font-size:14px;">Search destination...</span>
-      </button>
-      <div style="margin-top:24px;">
-        <div class="flex-between" style="margin-bottom:14px;">
-          <span style="font-weight:600;font-size:16px;">Recent Rides</span>
-          <button style="background:none;border:none;color:var(--cyan);font-size:13px;cursor:pointer;" onclick="showRideHistory()">View All →</button>
-        </div>
-        ${RIDE_HISTORY.slice(0,2).map(r => `
-          <button onclick="state.rider.pickup='${r.from}';state.rider.drop='${r.to}';riderGo('booking');" style="width:100%;background:var(--card-bg);border:1px solid rgba(0,229,255,0.04);border-radius:12px;padding:14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;">
-            <span style="color:var(--gray);"></span>
-            <div style="flex:1;"><div style="font-size:13px;">${r.from} → ${r.to}</div><div style="color:var(--gray);font-size:11px;">${r.date} · ₹${r.fare}</div></div>
-            <span style="color:var(--gray);">›</span>
-          </button>
-        `).join('')}
-      </div>`;
-  }
-
-
-  else if(s.step === 'booking') {
-    html = `
-      <button class="btn-icon" onclick="riderGo('home')" style="margin-bottom:16px;">←</button>
-      <div class="card" style="padding:18px;">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div style="display:flex;flex-direction:column;align-items:center;">
-            <span style="color:var(--success);font-size:14px;">●</span>
-            <div style="width:2px;height:30px;background:rgba(136,146,176,0.15);margin:2px 0;"></div>
-            <span style="color:var(--danger);font-size:14px;">◎</span>
-          </div>
-          <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
-            <div style="position:relative;">
-              <input class="input-field" id="pickup-input" placeholder="Pickup location" value="${s.pickup}" onfocus="showSuggestions('pickup')" oninput="state.rider.pickup=this.value;">
-              <div id="pickup-suggestions" class="suggestions hidden">
-                ${DELHI_PLACES.slice(0,5).map(p => `<button class="suggestion-item" onclick="state.rider.pickup='${p}';document.getElementById('pickup-input').value='${p}';document.getElementById('pickup-suggestions').classList.add('hidden');">📍 ${p}, Delhi</button>`).join('')}
-              </div>
-            </div>
-            <div style="position:relative;">
-              <input class="input-field" id="drop-input" placeholder="Drop location" value="${s.drop}" onfocus="showSuggestions('drop')" oninput="state.rider.drop=this.value;">
-              <div id="drop-suggestions" class="suggestions hidden">
-                ${DELHI_PLACES.slice(5,10).map(p => `<button class="suggestion-item" onclick="state.rider.drop='${p}';document.getElementById('drop-input').value='${p}';document.getElementById('drop-suggestions').classList.add('hidden');">📍 ${p}, Delhi</button>`).join('')}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <button class="btn btn-primary" onclick="if(state.rider.pickup&&state.rider.drop)riderGo('vehicle');" style="${(!s.pickup||!s.drop)?'opacity:0.4;pointer-events:none;':''}">Choose Vehicle →</button>`;
-  }
-
- 
-  else if(s.step === 'vehicle') {
-    html = `
-      <button class="btn-icon" onclick="riderGo('booking')" style="margin-bottom:16px;">←</button>
-      ${mapHTML(180, s.pickup, s.drop)}
-      <div class="flex-between" style="margin:16px 0 12px;">
-        <span style="font-weight:600;font-size:16px;">Choose your ride</span>
-        <span style="color:var(--gray);font-size:12px;">${distance} km</span>
-      </div>
-      ${VEHICLES.map(v => {
-        const vFare = Math.round(v.base + v.rate * distance);
-        const sel = s.selectedVehicle?.id === v.id;
-        return `<button class="vehicle-option ${sel?'selected':''}" onclick="state.rider.selectedVehicle=${JSON.stringify(v).replace(/"/g,'&quot;')};state.rider._fare=${vFare};renderRider();">
-          <span style="font-size:30px;">${v.icon}</span>
-          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">${v.name}</div><div style="color:var(--gray);font-size:11px;">${v.desc} · ${v.eta}</div></div>
-          <div style="text-align:right;"><div style="font-weight:700;font-size:16px;">₹${vFare}</div><div style="color:var(--gray);font-size:10px;">₹${v.rate}/km</div></div>
-        </button>`;
-      }).join('')}
-      <div class="card" style="margin-top:12px;">
-        <div style="color:var(--gray);font-size:11px;margin-bottom:8px;">Payment Method</div>
-        <div style="display:flex;gap:8px;">
-          ${[{id:"cash",l:" Cash"},{id:"upi",l:" UPI"},{id:"card",l:" Card"}].map(p =>
-            `<button class="pay-opt ${s.payment===p.id?'active':''}" onclick="state.rider.payment='${p.id}';renderRider();">${p.l}</button>`
-          ).join('')}
-        </div>
-      </div>
-      ${s.selectedVehicle ? `<button class="btn btn-primary" style="margin-top:8px;" onclick="riderGo('confirm')">Confirm Ride — ₹${s._fare || fare}</button>` : ''}`;
-  }
-
-  
-  else if(s.step === 'confirm') {
-    html = `
-      <div style="text-align:center;padding:30px 0 20px;">
-        <div style="width:70px;height:70px;border-radius:50%;margin:0 auto 16px;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;animation:pulse 1.5s infinite;font-size:28px;">🔍</div>
-        <h3 style="font-size:20px;margin-bottom:6px;">Finding your driver...</h3>
-        <p style="color:var(--gray);font-size:13px;">Usually takes less than 30 seconds</p>
-      </div>
-      <div class="card" style="margin-top:20px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-          <span style="font-size:24px;">${s.selectedVehicle?.icon}</span>
-          <div><div style="font-weight:600;">${s.selectedVehicle?.name}</div><div style="color:var(--gray);font-size:12px;">${s._distance} km · ${s.selectedVehicle?.eta}</div></div>
-          <div style="margin-left:auto;color:var(--cyan);font-weight:700;font-size:18px;">₹${s._fare}</div>
-        </div>
-        <div style="border-top:1px solid rgba(136,146,176,0.1);padding-top:12px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="color:var(--success);">●</span><span style="color:var(--gray-light);font-size:13px;">${s.pickup}</span></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--danger);">◎</span><span style="color:var(--gray-light);font-size:13px;">${s.drop}</span></div>
-        </div>
-      </div>
-      <button class="btn btn-success" style="margin-top:20px;" onclick="state.rider.driverPos=0;riderGo('tracking')">✅ Driver Found — Track Ride</button>`;
-  }
-
-
-  else if(s.step === 'tracking') {
-    html = `
-      ${mapHTML(240, s.pickup, s.drop, true, s.driverPos)}
-      <div class="card" style="margin-top:12px;">
-        <div class="flex-between" style="margin-bottom:8px;">
-          <span style="color:var(--gray);font-size:12px;">Ride Progress</span>
-          <span style="color:var(--cyan);font-size:12px;font-weight:600;" id="progress-pct">${s.driverPos}%</span>
-        </div>
-        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:${s.driverPos}%;background:linear-gradient(90deg,var(--primary),var(--cyan));"></div></div>
-      </div>
-      <div class="card" style="margin-top:8px;">
-        <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
-          <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:22px;">👤</div>
-          <div style="flex:1;">
-            <div style="font-weight:600;font-size:15px;">Rajesh Kumar</div>
-            <div style="display:flex;align-items:center;gap:4px;"><span style="color:var(--warning);font-size:12px;">★ 4.8</span><span style="color:var(--gray);font-size:12px;"> · DL 01 AB 1234</span></div>
-          </div>
-          <span style="font-size:28px;">${s.selectedVehicle?.icon||''}</span>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn-sm" style="flex:1;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);color:var(--success);">📞 Call</button>
-          <button class="btn-sm" style="flex:1;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);color:var(--cyan);">💬 Chat</button>
-          <button class="btn-sm" style="flex:1;background:rgba(255,23,68,0.1);border:1px solid rgba(255,23,68,0.2);color:var(--danger);">🆘 SOS</button>
-        </div>
-      </div>
-      <div class="grid-3" style="margin-top:12px;">
-        <div class="card" style="text-align:center;margin:0;"><div style="color:var(--cyan);font-size:20px;font-weight:700;" id="eta-text">${Math.max(1,Math.round((100-s.driverPos)/10))} min</div><div style="color:var(--gray);font-size:11px;">ETA</div></div>
-        <div class="card" style="text-align:center;margin:0;"><div style="font-size:20px;font-weight:700;">${s._distance} km</div><div style="color:var(--gray);font-size:11px;">Distance</div></div>
-        <div class="card" style="text-align:center;margin:0;"><div style="color:var(--success);font-size:20px;font-weight:700;">₹${s._fare}</div><div style="color:var(--gray);font-size:11px;">Fare</div></div>
-      </div>`;
-
-
-    clearAllIntervals();
-    setTimeout(() => {
-      intervals.tracking = setInterval(() => {
-        state.rider.driverPos += 2;
-        if(state.rider.driverPos >= 100) { clearInterval(intervals.tracking); setTimeout(()=>riderGo('rating'), 500); return; }
-        const dm = document.getElementById('driver-marker');
-        const pf = document.getElementById('progress-fill');
-        const pp = document.getElementById('progress-pct');
-        const et = document.getElementById('eta-text');
-        if(dm) { dm.style.left = (20+state.rider.driverPos*0.5)+'%'; dm.style.top = (55-state.rider.driverPos*0.2)+'%'; }
-        if(pf) pf.style.width = state.rider.driverPos+'%';
-        if(pp) pp.textContent = state.rider.driverPos+'%';
-        if(et) et.textContent = Math.max(1,Math.round((100-state.rider.driverPos)/10))+' min';
-      }, 300);
-    }, 100);
-  }
-
-
-  else if(s.step === 'rating') {
-    html = `
-      <div style="text-align:center;padding:20px 0;">
-        <div style="width:80px;height:80px;border-radius:50%;margin:0 auto 20px;background:linear-gradient(135deg,var(--success),#00C853);display:flex;align-items:center;justify-content:center;font-size:36px;">✓</div>
-        <h2 style="margin-bottom:6px;">Ride Complete! 🎉</h2>
-        <p style="color:var(--gray);font-size:14px;margin-bottom:24px;">${s.pickup} → ${s.drop}</p>
-        <div class="card" style="border-radius:20px;padding:24px;">
-          <div style="font-size:36px;font-weight:800;color:var(--cyan);margin-bottom:4px;">₹${s._fare}</div>
-          <div style="color:var(--gray);font-size:13px;margin-bottom:16px;">Paid via ${s.payment.toUpperCase()}</div>
-          <div style="display:flex;justify-content:center;gap:24px;padding-top:12px;border-top:1px solid rgba(136,146,176,0.1);">
-            <div style="text-align:center;"><div style="font-weight:600;">${s._distance} km</div><div style="color:var(--gray);font-size:11px;">Distance</div></div>
-            <div style="text-align:center;"><div style="font-weight:600;">12 min</div><div style="color:var(--gray);font-size:11px;">Duration</div></div>
-            <div style="text-align:center;"><div style="font-weight:600;">${s.selectedVehicle?.name}</div><div style="color:var(--gray);font-size:11px;">Vehicle</div></div>
-          </div>
-        </div>
-        <p style="color:var(--gray-light);font-size:15px;margin:24px 0 12px;">Rate your driver</p>
-        <div style="display:flex;justify-content:center;gap:8px;margin-bottom:24px;">
-          ${[1,2,3,4,5].map(i => `<button class="star-btn ${s.rating>=i?'active':''}" onclick="state.rider.rating=${i};renderRider();" style="font-size:36px;color:${s.rating>=i?'var(--warning)':'var(--gray)'};">${s.rating>=i?'★':'☆'}</button>`).join('')}
-        </div>
-        <button class="btn btn-primary" onclick="state.rider={step:'home',pickup:'',drop:'',selectedVehicle:null,driverPos:0,rating:0,payment:'cash',_distance:0,_fare:0};riderGo('home');">Done — Book Another Ride</button>
-      </div>`;
-  }
-
-  c.innerHTML = html;
-}
-
-function showSuggestions(type) {
-  document.getElementById(type+'-suggestions')?.classList.remove('hidden');
-  
-  const other = type==='pickup'?'drop':'pickup';
-  document.getElementById(other+'-suggestions')?.classList.add('hidden');
-}
-
-
-function driverGo(step) {
-  clearAllIntervals();
-  state.driver.step = step;
-  renderDriver();
-}
-
-function renderDriver() {
-  const c = document.getElementById('driver-content');
-  const s = state.driver;
-  let html = '';
-
-  
-  html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;">
-        <svg width="18" height="18" viewBox="0 0 40 40" fill="none"><path d="M5 32L13 8L20 22L27 8L35 32" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <span style="font-size:15px;font-weight:800;letter-spacing:2px;">MOVEO</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      ${badge(s.isOnline?'online':'offline')}
-      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:18px;">👤</div>
-    </div>
-  </div>`;
-
- 
-  if(s.step === 'home') {
-    html += `
-      <div style="margin-bottom:20px;">
-        <h2 style="font-size:22px;font-weight:700;margin-bottom:4px;">${s.isOnline?'You\'re Online 🟢':'Go Online to Start 🔴'}</h2>
-        <p style="color:var(--gray);font-size:13px;">${s.isOnline?'Waiting for ride requests...':'Toggle online to receive rides'}</p>
-      </div>
-      <button class="btn" style="margin-bottom:20px;font-size:18px;padding:20px;background:linear-gradient(135deg,${s.isOnline?'var(--danger),#FF6B6B':'var(--success),#00C853'});color:white;" onclick="state.driver.isOnline=!state.driver.isOnline;${!s.isOnline?"setTimeout(()=>{state.driver.timer=15;driverGo('request');},2000);":""}renderDriver();">
-        ⚡ ${s.isOnline?'GO OFFLINE':'GO ONLINE'}
-      </button>
-      ${s.isOnline ? mapHTML(160) : ''}
-      <div class="grid-2" style="margin-top:${s.isOnline?16:0}px;margin-bottom:16px;">
-        ${statCard('','Today','₹2,450','var(--success)')}
-        ${statCard('',"Today's Trips",'8','var(--cyan)')}
-        ${statCard('','This Week','₹14,800','var(--warning)')}
-        ${statCard('','This Month','₹54,200','#7B61FF')}
-      </div>
-      <div class="card">
-        <div style="font-weight:600;margin-bottom:12px;">Today's Trips</div>
-        ${[{from:"Saket",to:"CP",fare:320,time:"9:15 AM",rating:5},{from:"Dwarka",to:"Janakpuri",fare:180,time:"10:30 AM",rating:4},{from:"GK",to:"Nehru Place",fare:210,time:"11:45 AM",rating:5}].map((t,i,a) => `
-          <div style="display:flex;align-items:center;gap:12px;padding:10px 0;${i<a.length-1?'border-bottom:1px solid rgba(136,146,176,0.06);':''}">
-            <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,229,255,0.08);display:flex;align-items:center;justify-content:center;">🧭</div>
-            <div style="flex:1;"><div style="font-size:13px;">${t.from} → ${t.to}</div><div style="color:var(--gray);font-size:11px;">${t.time}</div></div>
-            <div style="text-align:right;"><div style="color:var(--success);font-weight:600;font-size:14px;">₹${t.fare}</div><div>${stars(t.rating,9)}</div></div>
-          </div>
-        `).join('')}
-      </div>`;
-  }
-
-
-  else if(s.step === 'request') {
-    html += `<div style="text-align:center;">
-      <div style="width:100px;height:100px;border-radius:50%;margin:20px auto 24px;position:relative;display:flex;align-items:center;justify-content:center;">
-        <svg width="100" height="100" style="position:absolute;transform:rotate(-90deg);"><circle cx="50" cy="50" r="45" stroke="var(--card-bg)" stroke-width="8" fill="none"/><circle cx="50" cy="50" r="45" stroke="var(--cyan)" stroke-width="8" fill="none" stroke-linecap="round" id="timer-circle" stroke-dasharray="283" stroke-dashoffset="${283-(s.timer/15)*283}"/></svg>
-        <span style="color:var(--cyan);font-size:28px;font-weight:800;" id="timer-text">${s.timer}s</span>
-      </div>
-      <h3 style="font-size:20px;margin-bottom:6px;">New Ride Request! 🔔</h3>
-      <p style="color:var(--gray);font-size:13px;margin-bottom:20px;">Accept before timer expires</p>
-      <div class="card" style="text-align:left;">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-          <div style="width:42px;height:42px;border-radius:50%;background:rgba(0,229,255,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">👤</div>
-          <div><div style="font-weight:600;">Ananya Sharma</div><div style="color:var(--warning);font-size:12px;">★ 4.9</div></div>
-          <div style="margin-left:auto;text-align:right;"><div style="color:var(--success);font-weight:700;font-size:20px;">₹285</div><div style="color:var(--gray);font-size:11px;">9.3 km</div></div>
-        </div>
-        <div style="padding:12px;background:var(--card-bg2);border-radius:12px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="color:var(--success);">●</span><span style="color:var(--gray-light);font-size:13px;">Connaught Place</span></div>
-          <div style="width:1px;height:10px;background:rgba(136,146,176,0.15);margin-left:6px;"></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--danger);">◎</span><span style="color:var(--gray-light);font-size:13px;">Hauz Khas Village</span></div>
-        </div>
-      </div>
-      <div style="display:flex;gap:12px;margin-top:16px;">
-        <button class="btn btn-danger-outline" style="flex:1;" onclick="state.driver.isOnline=true;driverGo('home');">✕ Decline</button>
-        <button class="btn btn-success" style="flex:2;" onclick="driverGo('navigating')">✓ Accept Ride</button>
-      </div>
-    </div>`;
-
-   
-    clearAllIntervals();
-    setTimeout(() => {
-      intervals.request = setInterval(() => {
-        state.driver.timer--;
-        const tc = document.getElementById('timer-circle');
-        const tt = document.getElementById('timer-text');
-        if(tc) tc.style.strokeDashoffset = 283 - (state.driver.timer/15)*283;
-        if(tt) tt.textContent = state.driver.timer + 's';
-        if(state.driver.timer <= 0) { clearInterval(intervals.request); state.driver.isOnline=true; driverGo('home'); }
-      }, 1000);
-    }, 100);
-  }
-
-  
-  else if(s.step === 'navigating') {
-    html += `
-      <div style="background:linear-gradient(135deg,var(--primary),var(--cyan));border-radius:16px;padding:20px;margin-bottom:16px;text-align:center;">
-        <div style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:4px;">Navigate to pickup</div>
-        <div style="font-size:28px;font-weight:800;">Connaught Place</div>
-        <div style="font-size:14px;color:rgba(255,255,255,0.8);margin-top:4px;">3 min · 1.2 km away</div>
-      </div>
-      ${mapHTML(240, "Connaught Place", "Hauz Khas", true, 20)}
-      <div class="card" style="margin-top:12px;">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:42px;height:42px;border-radius:50%;background:rgba(0,229,255,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">👤</div>
-          <div style="flex:1;"><div style="font-weight:600;">Ananya Sharma</div><div style="color:var(--gray);font-size:12px;">Rider · ⭐ 4.9</div></div>
-          <button style="width:40px;height:40px;border-radius:50%;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);cursor:pointer;font-size:16px;">📞</button>
-          <button style="width:40px;height:40px;border-radius:50%;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);cursor:pointer;font-size:16px;">💬</button>
-        </div>
-      </div>
-      <button class="btn btn-success" style="margin-top:12px;" onclick="state.driver.tripProgress=0;driverGo('trip')">▶ Start Trip — Rider Picked Up</button>`;
-  }
-
-
-  else if(s.step === 'trip') {
-    html += `
-      <div style="background:rgba(255,214,0,0.08);border:1px solid rgba(255,214,0,0.2);border-radius:16px;padding:16px;margin-bottom:16px;text-align:center;">
-        <div style="color:var(--warning);font-size:12px;margin-bottom:2px;"> Trip In Progress</div>
-        <div style="font-size:22px;font-weight:700;">Hauz Khas Village</div>
-        <div class="progress-bar" style="margin-top:10px;"><div class="progress-fill" id="trip-progress-fill" style="width:${s.tripProgress}%;background:linear-gradient(90deg,var(--warning),var(--success));"></div></div>
-        <div style="color:var(--gray);font-size:11px;margin-top:6px;" id="trip-progress-text">${s.tripProgress}% complete · ${Math.max(1,Math.round((100-s.tripProgress)/12))} min left</div>
-      </div>
-      ${mapHTML(200, "CP", "Hauz Khas", true, s.tripProgress)}
-      <div class="grid-3" style="margin-top:12px;">
-        <div class="card" style="text-align:center;margin:0;"><div style="color:var(--cyan);font-size:18px;font-weight:700;">₹285</div><div style="color:var(--gray);font-size:10px;">Fare</div></div>
-        <div class="card" style="text-align:center;margin:0;"><div style="font-size:18px;font-weight:700;">9.3 km</div><div style="color:var(--gray);font-size:10px;">Distance</div></div>
-        <div class="card" style="text-align:center;margin:0;"><div style="color:var(--success);font-size:18px;font-weight:700;">₹228</div><div style="color:var(--gray);font-size:10px;">Your Earning</div></div>
-      </div>`;
-
-    clearAllIntervals();
-    setTimeout(() => {
-      intervals.trip = setInterval(() => {
-        state.driver.tripProgress += 3;
-        if(state.driver.tripProgress >= 100) { clearInterval(intervals.trip); driverGo('complete'); return; }
-        const pf = document.getElementById('trip-progress-fill');
-        const pt = document.getElementById('trip-progress-text');
-        const dm = document.getElementById('driver-marker');
-        if(pf) pf.style.width = state.driver.tripProgress+'%';
-        if(pt) pt.textContent = state.driver.tripProgress+'% complete · '+Math.max(1,Math.round((100-state.driver.tripProgress)/12))+' min left';
-        if(dm) { dm.style.left=(20+state.driver.tripProgress*0.5)+'%'; dm.style.top=(55-state.driver.tripProgress*0.2)+'%'; }
-      }, 400);
-    }, 100);
-  }
-
- 
-  else if(s.step === 'complete') {
-    html += `
-      <div style="text-align:center;padding:20px 0;">
-        <div style="width:80px;height:80px;border-radius:50%;margin:0 auto 20px;background:linear-gradient(135deg,var(--success),#00C853);display:flex;align-items:center;justify-content:center;font-size:36px;">✓</div>
-        <h2 style="margin-bottom:6px;">Trip Complete! 🎉</h2>
-        <div class="card" style="border-radius:20px;padding:24px;margin:20px 0;border-color:rgba(0,230,118,0.12);">
-          <div style="font-size:14px;color:var(--gray);margin-bottom:4px;">You Earned</div>
-          <div style="font-size:40px;font-weight:800;color:var(--success);">₹228</div>
-          <div style="font-size:12px;color:var(--gray);margin-top:4px;">Total fare: ₹285 · Commission: 20%</div>
-          <div style="border-top:1px solid rgba(136,146,176,0.1);margin-top:16px;padding-top:16px;display:flex;justify-content:space-around;">
-            <div><div style="font-weight:600;">9.3 km</div><div style="color:var(--gray);font-size:11px;">Distance</div></div>
-            <div><div style="font-weight:600;">14 min</div><div style="color:var(--gray);font-size:11px;">Duration</div></div>
-            <div><div>${stars(5,12)}</div><div style="color:var(--gray);font-size:11px;">Rating</div></div>
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="state.driver.isOnline=true;driverGo('home');">Continue Driving</button>
-      </div>`;
-  }
-
-  c.innerHTML = html;
-}
-
-
-const ADMIN_TABS = [
-  { id:"overview", icon:"", label:"Overview" },
-  { id:"rides", icon:"", label:"Rides" },
-  { id:"drivers", icon:"", label:"Drivers" },
-  { id:"pricing", icon:"", label:"Pricing" },
-  { id:"reports", icon:"", label:"Reports" },
-];
-
-function adminGo(tab) {
-  state.admin.tab = tab;
-  state.admin.selectedDriver = null;
-  renderAdmin();
-}
-
-function renderAdmin() {
-  const tabsEl = document.getElementById('admin-tabs');
-  const c = document.getElementById('admin-content');
-  const s = state.admin;
-
- 
-  tabsEl.innerHTML = ADMIN_TABS.map(t =>
-    `<button class="tab-btn ${s.tab===t.id?'active':''}" onclick="adminGo('${t.id}')">${t.icon} ${t.label}</button>`
-  ).join('');
-
-  let html = '';
-
- 
-  if(s.tab === 'overview') {
-    html = `
-      <div class="grid-2" style="margin-bottom:16px;">
-        ${statCard('',"Today's Rides",'463','var(--cyan)',12)}
-        ${statCard('','Revenue','₹68.4K','var(--success)',8)}
-        ${statCard('','Active Drivers','127','#7B61FF',-3)}
-        ${statCard('','Active Riders','2,847','var(--warning)',15)}
-      </div>
-      <div class="card"><div style="font-weight:600;margin-bottom:14px;">Weekly Revenue</div><div class="chart-container"><canvas id="revenue-chart" height="180"></canvas></div></div>
-      <div class="card"><div style="font-weight:600;margin-bottom:14px;">Ride Distribution</div><div style="display:flex;align-items:center;">
-        <div style="width:50%;"><canvas id="pie-chart" height="140"></canvas></div>
-        <div style="flex:1;">
-          ${[{n:"Bike",v:35,c:"#00E5FF"},{n:"Mini",v:30,c:"#0A1AFF"},{n:"Sedan",v:25,c:"#7B61FF"},{n:"SUV",v:10,c:"#FF6B6B"}].map(v =>
-            `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:10px;height:10px;border-radius:3px;background:${v.c};"></div><span style="color:var(--gray-light);font-size:12px;flex:1;">${v.n}</span><span style="font-size:12px;font-weight:600;">${v.v}%</span></div>`
-          ).join('')}
-        </div>
-      </div></div>
-      <div class="card">
-        <div class="flex-between" style="margin-bottom:12px;">
-          <span style="font-weight:600;">Live Rides</span>
-          <span class="badge badge-online" style="animation:blink 1.5s infinite;">23 Active</span>
-        </div>
-        ${mapHTML(150)}
-      </div>`;
-
-    setTimeout(() => {
-     
-      const rc = document.getElementById('revenue-chart');
-      if(rc) {
-        new Chart(rc, {
-          type: 'line',
-          data: {
-            labels: revenueData.labels,
-            datasets: [{
-              data: revenueData.revenue,
-              borderColor: '#00E5FF',
-              backgroundColor: 'rgba(0,229,255,0.08)',
-              fill: true, tension: 0.4, pointRadius: 3,
-              pointBackgroundColor: '#00E5FF',
-            }]
-          },
-          options: {
-            responsive: true, plugins: { legend: { display: false } },
-            scales: {
-              x: { ticks: { color: '#8892B0', font: { size: 11 } }, grid: { display: false } },
-              y: { ticks: { color: '#8892B0', font: { size: 10 } }, grid: { color: 'rgba(0,229,255,0.05)' } }
-            }
-          }
-        });
-      }
-    
-      const pc = document.getElementById('pie-chart');
-      if(pc) {
-        new Chart(pc, {
-          type: 'doughnut',
-          data: {
-            labels: ['Bike','Mini','Sedan','SUV'],
-            datasets: [{ data: [35,30,25,10], backgroundColor: ['#00E5FF','#0A1AFF','#7B61FF','#FF6B6B'], borderWidth: 0 }]
-          },
-          options: { responsive: true, plugins: { legend: { display: false } }, cutout: '60%' }
-        });
-      }
-    }, 50);
-  }
-
-  
-  else if(s.tab === 'rides') {
-    html = `
-      <div style="display:flex;gap:8px;margin-bottom:14px;">
-        ${["all","completed","in_progress","cancelled"].map(f => `<button class="filter-btn ${f==='all'?'active':''}">${f==='all'?'All':f.replace('_',' ')}</button>`).join('')}
-      </div>
-      ${MOCK_RIDES.map(r => `
-        <div class="ride-card">
-          <div class="flex-between" style="margin-bottom:10px;">
-            <span style="color:var(--cyan);font-size:12px;font-weight:600;">${r.id}</span>
-            ${badge(r.status)}
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="color:var(--success);font-size:10px;">●</span><span style="color:var(--gray-light);font-size:12px;">${r.from}</span></div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span style="color:var(--danger);font-size:10px;">◎</span><span style="color:var(--gray-light);font-size:12px;">${r.to}</span></div>
-          <div style="display:flex;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(136,146,176,0.06);font-size:11px;">
-            <span style="color:var(--gray);"> ${r.rider}</span>
-            <span style="color:var(--gray);"> ${r.driver||'—'}</span>
-            <span style="color:var(--gray);">${r.vehicle} · ${r.distance}</span>
-            <span style="color:var(--success);font-weight:600;">₹${r.fare}</span>
-          </div>
-        </div>
-      `).join('')}`;
-  }
-
- 
-  else if(s.tab === 'drivers') {
-    if(s.selectedDriver) {
-      const d = s.selectedDriver;
-      html = `
-        <button style="display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--cyan);cursor:pointer;margin-bottom:16px;font-size:13px;" onclick="state.admin.selectedDriver=null;renderAdmin();">← Back to Drivers</button>
-        <div class="card" style="padding:20px;">
-          <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
-            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:24px;">👤</div>
-            <div style="flex:1;"><div style="font-weight:700;font-size:18px;">${d.name}</div><div style="color:var(--gray);font-size:12px;">${d.phone}</div></div>
-            ${badge(d.status)}
-          </div>
-          <div class="grid-2" style="margin-bottom:16px;">
-            <div style="background:var(--card-bg2);border-radius:12px;padding:12px;"><div style="color:var(--gray);font-size:11px;">Rating</div><div style="color:var(--warning);font-size:20px;font-weight:700;">⭐ ${d.rating}</div></div>
-            <div style="background:var(--card-bg2);border-radius:12px;padding:12px;"><div style="color:var(--gray);font-size:11px;">Total Rides</div><div style="font-size:20px;font-weight:700;">${d.rides}</div></div>
-            <div style="background:var(--card-bg2);border-radius:12px;padding:12px;"><div style="color:var(--gray);font-size:11px;">Earnings</div><div style="color:var(--success);font-size:20px;font-weight:700;">₹${d.earnings.toLocaleString()}</div></div>
-            <div style="background:var(--card-bg2);border-radius:12px;padding:12px;"><div style="color:var(--gray);font-size:11px;">Vehicle</div><div style="font-size:14px;font-weight:600;">${d.vehicle}</div><div style="color:var(--gray);font-size:11px;">${d.plate}</div></div>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button class="btn-sm" style="flex:1;background:${d.verified?'rgba(0,230,118,0.1)':'rgba(255,214,0,0.1)'};border:1px solid ${d.verified?'rgba(0,230,118,0.2)':'rgba(255,214,0,0.2)'};color:${d.verified?'var(--success)':'var(--warning)'};">${d.verified?'✓ Verified':'⚠ Verify Driver'}</button>
-            <button class="btn-sm" style="flex:1;background:rgba(255,23,68,0.1);border:1px solid rgba(255,23,68,0.2);color:var(--danger);">Block Driver</button>
-          </div>
-        </div>`;
-    } else {
-      html = `<div class="flex-between" style="margin-bottom:14px;"><span style="font-weight:600;font-size:16px;">All Drivers (${MOCK_DRIVERS.length})</span></div>`;
-      MOCK_DRIVERS.forEach(d => {
-        html += `<button class="driver-item" onclick='state.admin.selectedDriver=${JSON.stringify(d).replace(/'/g,"\\'")}; renderAdmin();'>
-          <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,rgba(10,26,255,0.7),rgba(0,229,255,0.7));display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;">👤</div>
-          <div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13px;">${d.name}</div><div style="color:var(--gray);font-size:11px;">${d.vehicle} · ⭐ ${d.rating} · ${d.rides} rides</div></div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-            ${badge(d.status)}
-            ${!d.verified?badge('pending'):''}
-          </div>
-        </button>`;
-      });
-    }
-  }
-
- 
-  else if(s.tab === 'pricing') {
-    const p = s.pricing;
-    html = `<h3 style="font-size:18px;font-weight:700;margin-bottom:16px;">Pricing Rules</h3>
-    <div class="card">
-      ${[{l:"Base Fare",k:"baseFare",u:"₹",min:10,max:100},{l:"Per Kilometer",k:"perKm",u:"₹/km",min:5,max:50},{l:"Per Minute",k:"perMin",u:"₹/min",min:1,max:10}].map(item => `
-        <div style="margin-bottom:18px;">
-          <div class="flex-between" style="margin-bottom:8px;">
-            <span style="color:var(--gray-light);font-size:13px;">${item.l}</span>
-            <span style="color:var(--cyan);font-weight:700;font-size:16px;">${item.u==='₹'?'₹':''}${p[item.k]}${item.u!=='₹'?' '+item.u:''}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <button class="btn-icon" style="width:32px;height:32px;border:1px solid rgba(0,229,255,0.12);" onclick="state.admin.pricing.${item.k}=Math.max(${item.min},state.admin.pricing.${item.k}-1);renderAdmin();">−</button>
-            <div style="flex:1;height:6px;background:var(--card-bg2);border-radius:3px;overflow:hidden;">
-              <div style="height:100%;width:${((p[item.k]-item.min)/(item.max-item.min))*100}%;background:linear-gradient(90deg,var(--primary),var(--cyan));border-radius:3px;"></div>
-            </div>
-            <button class="btn-icon" style="width:32px;height:32px;border:1px solid rgba(0,229,255,0.12);" onclick="state.admin.pricing.${item.k}=Math.min(${item.max},state.admin.pricing.${item.k}+1);renderAdmin();">+</button>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-    <div class="card" style="border-color:rgba(255,214,0,0.12);">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-        <span></span><span style="font-weight:600;">Surge Pricing</span>
-      </div>
-      <div style="display:flex;gap:8px;">
-        ${[1.0,1.25,1.5,1.75,2.0].map(sv => `<button class="surge-btn ${p.surge===sv?'active':''}" onclick="state.admin.pricing.surge=${sv};renderAdmin();">${sv}x</button>`).join('')}
-      </div>
-    </div>
-    <div class="card">
-      <div style="font-weight:600;margin-bottom:12px;">Fare Preview (10 km, 20 min)</div>
-      <div class="grid-2">
-        ${VEHICLES.map(v => {
-          const est = Math.round((p.baseFare + p.perKm*10 + p.perMin*20) * p.surge * (v.rate/12));
-          return `<div style="background:var(--card-bg2);border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;"><span style="font-size:22px;">${v.icon}</span><div><div style="font-size:12px;font-weight:600;">${v.name}</div><div style="color:var(--cyan);font-size:16px;font-weight:700;">₹${est}</div></div></div>`;
-        }).join('')}
-      </div>
-    </div>`;
-  }
-
-  // REPORTS
-  else if(s.tab === 'reports') {
-    html = `<h3 style="font-size:18px;font-weight:700;margin-bottom:16px;">Analytics & Reports</h3>
-    <div class="card"><div style="font-weight:600;margin-bottom:12px;">Rides by Hour (Today)</div><div class="chart-container"><canvas id="hourly-chart" height="160"></canvas></div></div>
-    <div class="card"><div style="font-weight:600;margin-bottom:12px;">Revenue vs Rides (Weekly)</div><div class="chart-container"><canvas id="weekly-chart" height="160"></canvas></div>
-      <div style="display:flex;justify-content:center;gap:20px;margin-top:8px;">
-        <div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:3px;background:var(--cyan);border-radius:2px;"></div><span style="color:var(--gray);font-size:11px;">Revenue</span></div>
-        <div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:3px;background:var(--warning);border-radius:2px;"></div><span style="color:var(--gray);font-size:11px;">Rides</span></div>
-      </div>
-    </div>
-    <div class="grid-2">
-      ${statCard('','Avg Fare','₹247','var(--cyan)')}
-      ${statCard('','Avg Duration','18 min','var(--warning)')}
-      ${statCard('','Avg Rating','4.6 ⭐','var(--warning)')}
-      ${statCard('','Cancel Rate','8.2%','var(--danger)')}
-    </div>`;
-
-    setTimeout(() => {
-      const hourlyD = Array.from({length:24}, (_,i) => Math.floor(Math.random()*60)+(i>=8&&i<=10?40:i>=17&&i<=20?50:10));
-      const hc = document.getElementById('hourly-chart');
-      if(hc) {
-        new Chart(hc, {
-          type: 'bar',
-          data: {
-            labels: Array.from({length:24},(_,i)=>i+':00'),
-            datasets: [{data:hourlyD, backgroundColor:'#00E5FF', borderRadius:4}]
-          },
-          options: {
-            responsive:true, plugins:{legend:{display:false}},
-            scales: {
-              x:{ticks:{color:'#8892B0',font:{size:9},maxTicksLimit:8},grid:{display:false}},
-              y:{ticks:{color:'#8892B0',font:{size:10}},grid:{color:'rgba(0,229,255,0.05)'}}
-            }
-          }
-        });
-      }
-      const wc = document.getElementById('weekly-chart');
-      if(wc) {
-        new Chart(wc, {
-          type: 'line',
-          data: {
-            labels: revenueData.labels,
-            datasets: [
-              {data:revenueData.revenue, borderColor:'#00E5FF', backgroundColor:'transparent', tension:0.4, pointRadius:3, pointBackgroundColor:'#00E5FF', yAxisID:'y'},
-              {data:revenueData.rides, borderColor:'#FFD600', backgroundColor:'transparent', tension:0.4, pointRadius:3, pointBackgroundColor:'#FFD600', yAxisID:'y1'},
-            ]
-          },
-          options: {
-            responsive:true, plugins:{legend:{display:false}},
-            scales: {
-              x:{ticks:{color:'#8892B0',font:{size:11}},grid:{display:false}},
-              y:{position:'left',ticks:{color:'#8892B0',font:{size:10}},grid:{color:'rgba(0,229,255,0.05)'}},
-              y1:{position:'right',ticks:{color:'#8892B0',font:{size:10}},grid:{display:false}}
-            }
-          }
-        });
-      }
-    }, 50);
-  }
-
-  c.innerHTML = html;
-}
-
-
-document.addEventListener('click', (e) => {
-  if(!e.target.closest('#pickup-input') && !e.target.closest('#pickup-suggestions'))
-    document.getElementById('pickup-suggestions')?.classList.add('hidden');
-  if(!e.target.closest('#drop-input') && !e.target.closest('#drop-suggestions'))
-    document.getElementById('drop-suggestions')?.classList.add('hidden');
-});
+const V=[{id:"bike",n:"Bike",r:7,b:25,e:"2 min",d:"Quick & affordable"},{id:"mini",n:"Mini",r:12,b:40,e:"4 min",d:"Compact sedan"},{id:"sedan",n:"Sedan",r:16,b:50,e:"5 min",d:"Comfortable ride"},{id:"suv",n:"SUV",r:22,b:80,e:"7 min",d:"Spacious & premium"}];
+const PL=["Connaught Place","India Gate","Hauz Khas","Saket","Lajpat Nagar","Karol Bagh","Dwarka Sec-21","Rohini Sec-3","Vasant Kunj","Nehru Place","Rajouri Garden","Chandni Chowk","Preet Vihar","Janakpuri","Greater Kailash"];
+const DR=[{id:1,n:"Rajesh Kumar",ph:"+91 98765 43210",v:"Swift Dzire",pl:"DL 01 AB 1234",rt:4.8,ri:1247,st:"online",vr:true,ea:32500},{id:2,n:"Amit Singh",ph:"+91 87654 32109",v:"WagonR",pl:"DL 02 CD 5678",rt:4.6,ri:892,st:"on_ride",vr:true,ea:28700},{id:3,n:"Suresh Yadav",ph:"+91 76543 21098",v:"Alto 800",pl:"DL 03 EF 9012",rt:4.3,ri:456,st:"offline",vr:true,ea:15200},{id:4,n:"Vikram Sharma",ph:"+91 65432 10987",v:"Ertiga",pl:"DL 04 GH 3456",rt:4.9,ri:2103,st:"online",vr:true,ea:54800},{id:5,n:"Deepak Verma",ph:"+91 54321 09876",v:"Honda Activa",pl:"DL 05 IJ 7890",rt:4.1,ri:234,st:"offline",vr:false,ea:8900},{id:6,n:"Manoj Tiwari",ph:"+91 43210 98765",v:"Creta",pl:"DL 06 KL 2345",rt:4.7,ri:1567,st:"online",vr:true,ea:41200}];
+const RI=[{id:"MV-1001",rr:"Ananya S.",dr:"Rajesh Kumar",f:"Connaught Place",t:"Hauz Khas",fa:245,st:"completed",vh:"Sedan",ds:"8.2 km"},{id:"MV-1002",rr:"Priya M.",dr:"Amit Singh",f:"Saket",t:"India Gate",fa:180,st:"in_progress",vh:"Mini",ds:"6.1 km"},{id:"MV-1003",rr:"Rohit K.",dr:"Vikram Sharma",f:"Dwarka",t:"Nehru Place",fa:420,st:"completed",vh:"SUV",ds:"18.5 km"},{id:"MV-1004",rr:"Sneha L.",dr:null,f:"Rohini",t:"Rajouri Garden",fa:110,st:"cancelled",vh:"Bike",ds:"4.3 km"},{id:"MV-1005",rr:"Karan J.",dr:"Manoj Tiwari",f:"Vasant Kunj",t:"Chandni Chowk",fa:380,st:"completed",vh:"Sedan",ds:"15.8 km"}];
+const HI=[{f:"Connaught Place",t:"Hauz Khas",fa:245,dt:"Today",rt:5,dr:"Rajesh K."},{f:"Saket",t:"India Gate",fa:180,dt:"Yesterday",rt:4,dr:"Amit S."},{f:"Dwarka",t:"Nehru Place",fa:420,dt:"2 days ago",rt:5,dr:"Vikram S."}];
+const RV={l:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],r:[45000,52000,48000,61000,73000,82000,67000],d:[320,380,350,420,510,580,460]};
+let S={r:{s:"home",pu:"",dr:"",vh:null,po:0,rt:0,py:"cash",di:0,fa:0},d:{s:"home",on:false,ti:15,pr:0},a:{t:"overview",sd:null,p:{ba:40,km:12,mn:2,su:1.0}}};
+let I={};
+function ic(id,s=18){return`<svg width="${s}" height="${s}" style="stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><use href="#i-${id}"/></svg>`}
+function bg(s){const m={online:"Online",offline:"Offline",on_ride:"On Ride",completed:"Completed",in_progress:"In Progress",cancelled:"Cancelled",pending:"Pending"};return`<span class="bdg b-${s}"><i></i>${m[s]||s}</span>`}
+function st(n,s=13){let h='';for(let i=1;i<=5;i++)h+=`<svg width="${s}" height="${s}" style="stroke:var(--warn);fill:${i<=n?'var(--warn)':'none'};stroke-width:2"><use href="#i-star"/></svg>`;return h}
+function sc(i,l,v,c='var(--cyan)',tr=null){let t='';if(tr!==null)t=`<div style="font-size:11px;margin-top:6px;font-weight:600;color:${tr>0?'var(--ok)':'var(--err)'};">${tr>0?'&#9650; ':'&#9660; '} ${Math.abs(tr)}% vs last week</div>`;return`<div class="stat"><div class="orb" style="background:${c}"></div><div style="font-size:12px;color:var(--gr);margin-bottom:10px;display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:3px;background:${c}"></div>${l}</div><div style="font-size:24px;font-weight:800;font-family:'Outfit'">${v}</div>${t}</div>`}
+function mp(h=280,pu=null,dr=null,sd=false,dp=30){let g='';for(let i=1;i<=10;i++)g+=`<div class="gl" style="top:${i*9}%;left:0;right:0;height:1px"></div>`;for(let i=1;i<=14;i++)g+=`<div class="gl" style="left:${i*7}%;top:0;bottom:0;width:1px"></div>`;let m='';if(pu)m+=`<div class="mk" style="left:65px;top:${h*.58}px"><div class="md" style="background:var(--ok);box-shadow:0 0 16px rgba(0,230,118,.25);color:#fff">${ic('pin',14)}</div><span style="color:var(--ok)">${pu}</span></div>`;if(dr)m+=`<div class="mk" style="right:40px;top:${h*.16}px"><div class="md" style="background:var(--err);box-shadow:0 0 16px rgba(255,61,87,.25);color:#fff">${ic('tgt',14)}</div><span style="color:var(--err)">${dr}</span></div>`;if(sd)m+=`<div class="dp" id="dP" style="left:${20+dp*.5}%;top:${55-dp*.2}%"><div class="dd">${ic('nav',16)}</div></div>`;return`<div class="map" style="height:${h}px">${g}<div class="rd" style="top:40%;left:0;right:0;height:2px"></div><div class="rd" style="top:65%;left:0;right:0;height:1px"></div><div class="rd" style="left:30%;top:0;bottom:0;width:2px"></div><div class="rd" style="left:70%;top:0;bottom:0;width:1px"></div><svg style="position:absolute;inset:0;width:100%;height:100%"><path d="M80 ${h*.64} Q150 ${h*.36} 200 ${h*.43} T320 ${h*.29}" stroke="var(--cyan)" stroke-width="2.5" fill="none" stroke-dasharray="6 4" opacity=".5"/></svg>${m}<div class="lb">${ic('map',10)} Delhi NCR</div></div>`}
+
+function go(a){cl();document.querySelectorAll('#pL,#pR,#pD,#pA').forEach(e=>e.classList.add('hid'));if(a==='landing'){document.getElementById('pL').classList.remove('hid');return}document.getElementById('p'+a[0].toUpperCase()).classList.remove('hid');if(a==='rider')rr();if(a==='driver')rd();if(a==='admin')ra()}
+function cl(){Object.values(I).forEach(id=>clearInterval(id));I={}}
+function tm(s){document.getElementById('rM').classList.toggle('hid',!s)}
+function rg(s){cl();S.r.s=s;rr()}
+function rh(){const c=document.getElementById('rC');c.innerHTML=`<div class="fx" style="gap:12px;margin-bottom:20px"><button class="bi" onclick="rg('home')">${ic('al')}</button><h3 style="font-size:18px">Ride History</h3></div>`+HI.map(r=>`<div class="card"><div class="fxb" style="margin-bottom:8px"><span style="color:var(--gr);font-size:12px">${r.dt}</span><span style="color:var(--ok);font-weight:700">₹${r.fa}</span></div><div class="fx" style="gap:8px;margin-bottom:6px"><div style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></div><span style="font-size:13px">${r.f}</span></div><div style="width:1px;height:10px;background:rgba(107,117,153,.15);margin-left:4px"></div><div class="fx" style="gap:8px"><div style="width:8px;height:8px;border-radius:50%;border:2px solid var(--err)"></div><span style="font-size:13px">${r.t}</span></div><div class="fxb" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(107,117,153,.06)"><span style="color:var(--gr);font-size:12px">Driver: ${r.dr}</span><div class="fx" style="gap:2px">${st(r.rt,11)}</div></div></div>`).join('')}
+
+function rr(){const c=document.getElementById('rC'),s=S.r;if(s.pu&&s.dr&&!s.di)s.di=(Math.random()*15+3).toFixed(1);if(s.vh)s.fa=Math.round(s.vh.b+s.vh.r*s.di);let h='';
+if(s.s==='home'){h=`<div style="margin-bottom:20px"><h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Where to?</h2><p style="color:var(--gr);font-size:13px">Book a ride anywhere in Delhi</p></div>${mp(190)}<div class="fx" style="gap:10px;margin:16px 0;overflow-x:auto;padding-bottom:4px">${["Home","Office","Market","Hospital"].map(q=>`<button style="background:var(--card);border:1px solid var(--cb);border-radius:10px;padding:10px 18px;color:var(--grl);font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-weight:600;letter-spacing:.3px" onclick="S.r.pu='My Location';S.r.dr='${q}';rg('booking')">${q}</button>`).join('')}</div><button onclick="rg('booking')" style="width:100%;padding:14px 18px;background:var(--card);border:1px solid var(--cb);border-radius:var(--r);cursor:pointer;display:flex;align-items:center;gap:12px"><span style="color:var(--gr)">${ic('search')}</span><span style="color:var(--gr);font-size:14px">Search destination</span></button><div style="margin-top:24px"><div class="fxb" style="margin-bottom:14px"><span style="font-family:'Outfit';font-weight:700;font-size:15px">Recent</span><button style="background:none;border:none;color:var(--cyan);font-size:13px;cursor:pointer;font-weight:600" onclick="rh()">View All</button></div>${HI.slice(0,2).map(r=>`<button onclick="S.r.pu='${r.f}';S.r.dr='${r.t}';rg('booking')" style="width:100%;background:var(--card);border:1px solid var(--cb);border-radius:12px;padding:14px 16px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left"><span style="color:var(--gr)">${ic('clk',16)}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${r.f} &rarr; ${r.t}</div><div style="color:var(--gr);font-size:11px;margin-top:2px">${r.dt} · ₹${r.fa}</div></div><span style="color:var(--gr)">${ic('cr',16)}</span></button>`).join('')}</div>`}
+else if(s.s==='booking'){h=`<button class="bi" style="margin-bottom:16px" onclick="rg('home')">${ic('al')}</button><div class="card"><div class="fx" style="gap:12px"><div style="display:flex;flex-direction:column;align-items:center;padding-top:4px"><div style="width:10px;height:10px;border-radius:50%;background:var(--ok)"></div><div style="width:1.5px;height:28px;background:rgba(107,117,153,.15);margin:3px 0"></div><div style="width:10px;height:10px;border-radius:50%;border:2px solid var(--err)"></div></div><div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="position:relative"><input class="inp" id="pi" placeholder="Pickup location" value="${s.pu}" onfocus="ss('p')" oninput="S.r.pu=this.value"><div id="ps" class="sgs hid">${PL.slice(0,5).map(p=>`<button class="sgi" onclick="S.r.pu='${p}';document.getElementById('pi').value='${p}';document.getElementById('ps').classList.add('hid')">${ic('pin',13)} ${p}, Delhi</button>`).join('')}</div></div><div style="position:relative"><input class="inp" id="di" placeholder="Drop location" value="${s.dr}" onfocus="ss('d')" oninput="S.r.dr=this.value"><div id="ds" class="sgs hid">${PL.slice(5,10).map(p=>`<button class="sgi" onclick="S.r.dr='${p}';document.getElementById('di').value='${p}';document.getElementById('ds').classList.add('hid')">${ic('pin',13)} ${p}, Delhi</button>`).join('')}</div></div></div></div></div><button class="btn bc" onclick="if(S.r.pu&&S.r.dr)rg('vehicle')" style="${(!s.pu||!s.dr)?'opacity:.35;pointer-events:none':''}">Choose Vehicle ${ic('ar',16)}</button>`}
+else if(s.s==='vehicle'){h=`<button class="bi" style="margin-bottom:16px" onclick="rg('booking')">${ic('al')}</button>${mp(170,s.pu,s.dr)}<div class="fxb" style="margin:16px 0 12px"><span style="font-family:'Outfit';font-weight:700;font-size:15px">Choose your ride</span><span style="color:var(--gr);font-size:12px;font-weight:600">${s.di} km</span></div>${V.map(v=>{const f=Math.round(v.b+v.r*s.di),sl=s.vh?.id===v.id;return`<button class="vo ${sl?'sel':''}" onclick="S.r.vh=${JSON.stringify(v).replace(/"/g,'&quot;')};S.r.fa=${f};rr()"><div class="vi">${v.n.substring(0,2).toUpperCase()}</div><div style="flex:1"><div style="font-weight:600;font-size:14px">${v.n}</div><div style="color:var(--gr);font-size:11px;margin-top:2px">${v.d} · ${v.e}</div></div><div style="text-align:right"><div style="font-weight:800;font-size:16px">₹${f}</div><div style="color:var(--gr);font-size:10px">₹${v.r}/km</div></div></button>`}).join('')}<div class="card" style="margin-top:12px"><div style="color:var(--gr);font-size:11px;margin-bottom:10px;font-weight:600;letter-spacing:.5px">PAYMENT</div><div class="fx" style="gap:8px">${[{i:"cash",l:"Cash"},{i:"upi",l:"UPI"},{i:"card",l:"Card"}].map(p=>`<button class="pb ${s.py===p.i?'a':''}" onclick="S.r.py='${p.i}';rr()">${p.l}</button>`).join('')}</div></div>${s.vh?`<button class="btn bc" style="margin-top:8px" onclick="rg('confirm')">Confirm Ride — ₹${s.fa}</button>`:''}`}
+else if(s.s==='confirm'){h=`<div style="text-align:center;padding:36px 0 20px"><div style="width:72px;height:72px;border-radius:50%;margin:0 auto 20px;background:linear-gradient(135deg,var(--pri),var(--cyan));display:flex;align-items:center;justify-content:center;animation:glow 1.5s infinite"><svg width="28" height="28" style="stroke:#fff;fill:none;stroke-width:2;animation:spin 2s linear infinite"><use href="#i-search"/></svg></div><h3 style="font-size:20px;margin-bottom:6px">Finding your driver</h3><p style="color:var(--gr);font-size:13px">This usually takes under 30 seconds</p></div><div class="card" style="margin-top:20px"><div class="fx" style="gap:12px;margin-bottom:14px"><div class="vi">${s.vh.n.substring(0,2).toUpperCase()}</div><div><div style="font-weight:600">${s.vh.n}</div><div style="color:var(--gr);font-size:12px">${s.di} km · ${s.vh.e}</div></div><div style="margin-left:auto;color:var(--cyan);font-weight:800;font-size:18px;font-family:'Outfit'">₹${s.fa}</div></div><div style="border-top:1px solid rgba(107,117,153,.06);padding-top:12px"><div class="fx" style="gap:8px;margin-bottom:8px"><div style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></div><span style="color:var(--grl);font-size:13px">${s.pu}</span></div><div class="fx" style="gap:8px"><div style="width:8px;height:8px;border-radius:50%;border:2px solid var(--err)"></div><span style="color:var(--grl);font-size:13px">${s.dr}</span></div></div></div><button class="btn bs" style="margin-top:20px" onclick="S.r.po=0;rg('tracking')">Driver Found — Track Ride</button>`}
+else if(s.s==='tracking'){h=`${mp(230,s.pu,s.dr,true,s.po)}<div class="card" style="margin-top:12px"><div class="fxb" style="margin-bottom:8px"><span style="color:var(--gr);font-size:12px;font-weight:600;letter-spacing:.3px">RIDE PROGRESS</span><span style="color:var(--cyan);font-size:12px;font-weight:700" id="pp">${s.po}%</span></div><div class="prg"><div class="prg-bar" id="pf" style="width:${s.po}%;background:linear-gradient(90deg,var(--pri),var(--cyan))"></div></div></div><div class="card"><div class="fx" style="gap:14px;margin-bottom:14px"><div class="av" style="width:50px;height:50px">${ic('usr',22)}</div><div style="flex:1"><div style="font-weight:700;font-size:15px">Rajesh Kumar</div><div class="fx" style="gap:8px;margin-top:2px"><span style="color:var(--warn);font-size:12px">${ic('star',12)} 4.8</span><span style="color:var(--gr);font-size:12px">DL 01 AB 1234</span></div></div><div class="vi" style="width:42px;height:42px">${s.vh?.n?.substring(0,2)||'SD'}</div></div><div class="fx" style="gap:8px"><button class="bsm" style="flex:1;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.15);color:var(--ok)">${ic('ph',14)} Call</button><button class="bsm" style="flex:1;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.15);color:var(--cyan)">${ic('msg',14)} Chat</button><button class="bsm" style="flex:1;background:rgba(255,61,87,.06);border:1px solid rgba(255,61,87,.15);color:var(--err)">${ic('sh',14)} SOS</button></div></div><div class="g3" style="margin-top:12px"><div class="card" style="text-align:center;margin:0"><div style="color:var(--cyan);font-size:20px;font-weight:800;font-family:'Outfit'" id="et">${Math.max(1,Math.round((100-s.po)/10))} min</div><div style="color:var(--gr);font-size:10px;font-weight:600;margin-top:4px;letter-spacing:.5px">ETA</div></div><div class="card" style="text-align:center;margin:0"><div style="font-size:20px;font-weight:800;font-family:'Outfit'">${s.di} km</div><div style="color:var(--gr);font-size:10px;font-weight:600;margin-top:4px;letter-spacing:.5px">DISTANCE</div></div><div class="card" style="text-align:center;margin:0"><div style="color:var(--ok);font-size:20px;font-weight:800;font-family:'Outfit'">₹${s.fa}</div><div style="color:var(--gr);font-size:10px;font-weight:600;margin-top:4px;letter-spacing:.5px">FARE</div></div></div>`;cl();setTimeout(()=>{I.t=setInterval(()=>{S.r.po+=2;if(S.r.po>=100){clearInterval(I.t);setTimeout(()=>rg('rating'),400);return}const d=document.getElementById('dP'),f=document.getElementById('pf'),p=document.getElementById('pp'),e=document.getElementById('et');if(d){d.style.left=(20+S.r.po*.5)+'%';d.style.top=(55-S.r.po*.2)+'%'}if(f)f.style.width=S.r.po+'%';if(p)p.textContent=S.r.po+'%';if(e)e.textContent=Math.max(1,Math.round((100-S.r.po)/10))+' min'},300)},100)}
+else if(s.s==='rating'){h=`<div style="text-align:center;padding:24px 0"><div style="width:80px;height:80px;border-radius:50%;margin:0 auto 24px;background:linear-gradient(135deg,var(--ok),#00C853);display:flex;align-items:center;justify-content:center;color:#fff">${ic('chk',36)}</div><h2 style="font-family:'Outfit';font-size:22px;margin-bottom:6px">Ride Complete</h2><p style="color:var(--gr);font-size:13px;margin-bottom:28px">${s.pu} &rarr; ${s.dr}</p><div class="card" style="border-radius:20px;padding:28px"><div style="font-size:36px;font-weight:900;color:var(--cyan);font-family:'Outfit'">₹${s.fa}</div><div style="color:var(--gr);font-size:12px;margin-top:4px;margin-bottom:20px">Paid via ${s.py.toUpperCase()}</div><div class="fx" style="justify-content:center;gap:32px;padding-top:16px;border-top:1px solid rgba(107,117,153,.06)"><div style="text-align:center"><div style="font-weight:700">${s.di} km</div><div style="color:var(--gr);font-size:10px;font-weight:600;margin-top:2px;letter-spacing:.5px">DISTANCE</div></div><div style="text-align:center"><div style="font-weight:700">12 min</div><div style="color:var(--gr);font-size:10px;font-weight:600;margin-top:2px;letter-spacing:.5px">DURATION</div></div><div style="text-align:center"><div style="font-weight:700">${s.vh?.n}</div><div style="color:var(--gr);font-size:10px;font-weight:600;margin-top:2px;letter-spacing:.5px">VEHICLE</div></div></div></div><p style="color:var(--grl);font-size:14px;margin:28px 0 14px">Rate your driver</p><div class="fx" style="justify-content:center;gap:10px;margin-bottom:28px">${[1,2,3,4,5].map(i=>`<button class="sr ${s.rt>=i?'on':''}" onclick="S.r.rt=${i};rr()"><svg width="28" height="28" style="stroke:currentColor;fill:${s.rt>=i?'currentColor':'none'};stroke-width:2"><use href="#i-star"/></svg></button>`).join('')}</div><button class="btn bc" onclick="S.r={s:'home',pu:'',dr:'',vh:null,po:0,rt:0,py:'cash',di:0,fa:0};rg('home')">Done</button></div>`}
+c.innerHTML=h}
+function ss(t){document.getElementById(t==='p'?'ps':'ds')?.classList.remove('hid');document.getElementById(t==='p'?'ds':'ps')?.classList.add('hid')}
+document.addEventListener('click',e=>{if(!e.target.closest('#pi')&&!e.target.closest('#ps'))document.getElementById('ps')?.classList.add('hid');if(!e.target.closest('#di')&&!e.target.closest('#ds'))document.getElementById('ds')?.classList.add('hid')});
+
+// DRIVER
+function dg(s){cl();S.d.s=s;rd()}
+function rd(){const c=document.getElementById('dC'),s=S.d;let h=`<div class="fxb" style="margin-bottom:20px"><div class="fx" style="gap:8px"><div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--pri),var(--cyan));display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 40 40" fill="none"><path d="M5 32L13 8L20 22L27 8L35 32" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span style="font-family:'Outfit';font-size:15px;font-weight:800;letter-spacing:2px">MOVEO</span></div><div class="fx" style="gap:10px">${bg(s.on?'online':'offline')}<div class="av" style="width:42px;height:42px">${ic('usr',18)}</div></div></div>`;
+if(s.s==='home'){h+=`<div style="margin-bottom:20px"><h2 style="font-family:'Outfit';font-size:21px;font-weight:800;margin-bottom:4px">${s.on?"You're Online":"Go Online to Start"}</h2><p style="color:var(--gr);font-size:13px">${s.on?'Waiting for ride requests...':'Toggle online to receive rides'}</p></div><button class="btn" style="margin-bottom:20px;font-size:16px;padding:20px;background:linear-gradient(135deg,${s.on?'var(--err),#FF6B6B':'var(--ok),#00C853'});color:#fff;box-shadow:0 4px 20px ${s.on?'rgba(255,61,87,.2)':'rgba(0,230,118,.2)'}" onclick="S.d.on=!S.d.on;${!s.on?"setTimeout(()=>{S.d.ti=15;dg('request')},2000);":""}rd()">${ic('zap',20)} ${s.on?'GO OFFLINE':'GO ONLINE'}</button>${s.on?mp(150):''}<div class="g2" style="margin-top:16px;margin-bottom:16px">${sc(ic('dlr',15),'Today','₹2,450','var(--ok)')}${sc(ic('car',15),"Today's Trips",'8','var(--cyan)')}${sc(ic('trd',15),'This Week','₹14,800','var(--warn)')}${sc(ic('bar',15),'This Month','₹54,200','#7B61FF')}</div><div class="card"><div style="font-weight:700;margin-bottom:14px;font-family:'Outfit'">Today's Trips</div>${[{f:"Saket",t:"CP",fa:320,ti:"9:15 AM",rt:5},{f:"Dwarka",t:"Janakpuri",fa:180,ti:"10:30 AM",rt:4},{f:"GK",t:"Nehru Place",fa:210,ti:"11:45 AM",rt:5}].map((t,i,a)=>`<div class="fx" style="gap:12px;padding:12px 0;${i<a.length-1?'border-bottom:1px solid rgba(107,117,153,.04)':''}"><div style="width:36px;height:36px;border-radius:10px;background:rgba(0,229,255,.06);display:flex;align-items:center;justify-content:center;color:var(--cyan)">${ic('nav',16)}</div><div style="flex:1"><div style="font-size:13px;font-weight:500">${t.f} &rarr; ${t.t}</div><div style="color:var(--gr);font-size:11px;margin-top:2px">${t.ti}</div></div><div style="text-align:right"><div style="color:var(--ok);font-weight:700;font-size:14px">₹${t.fa}</div><div class="fx" style="gap:2px;justify-content:flex-end;margin-top:2px">${st(t.rt,9)}</div></div></div>`).join('')}</div>`}
+else if(s.s==='request'){h+=`<div style="text-align:center"><div style="width:100px;height:100px;border-radius:50%;margin:20px auto 28px;position:relative;display:flex;align-items:center;justify-content:center"><svg width="100" height="100" style="position:absolute;transform:rotate(-90deg)"><circle cx="50" cy="50" r="45" stroke="var(--card)" stroke-width="6" fill="none"/><circle cx="50" cy="50" r="45" stroke="var(--cyan)" stroke-width="6" fill="none" stroke-linecap="round" id="tC" stroke-dasharray="283" stroke-dashoffset="${283-(s.ti/15)*283}"/></svg><span style="color:var(--cyan);font-size:26px;font-weight:800;font-family:'Outfit'" id="tT">${s.ti}s</span></div><h3 style="font-family:'Outfit';font-size:20px;margin-bottom:6px">New Ride Request</h3><p style="color:var(--gr);font-size:13px;margin-bottom:24px">Accept before timer runs out</p><div class="card" style="text-align:left"><div class="fx" style="gap:12px;margin-bottom:14px"><div class="av" style="width:42px;height:42px">${ic('usr',18)}</div><div><div style="font-weight:600">Ananya Sharma</div><div class="fx" style="gap:4px;margin-top:2px"><span style="color:var(--warn);font-size:12px">${ic('star',11)} 4.9</span></div></div><div style="margin-left:auto;text-align:right"><div style="color:var(--ok);font-weight:800;font-size:20px;font-family:'Outfit'">₹285</div><div style="color:var(--gr);font-size:11px">9.3 km</div></div></div><div style="padding:14px;background:var(--card2);border-radius:12px"><div class="fx" style="gap:8px;margin-bottom:8px"><div style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></div><span style="color:var(--grl);font-size:13px">Connaught Place</span></div><div style="width:1px;height:10px;background:rgba(107,117,153,.1);margin-left:4px"></div><div class="fx" style="gap:8px"><div style="width:8px;height:8px;border-radius:50%;border:2px solid var(--err)"></div><span style="color:var(--grl);font-size:13px">Hauz Khas Village</span></div></div></div><div class="fx" style="gap:12px;margin-top:16px"><button class="btn bdo" style="flex:1" onclick="S.d.on=true;dg('home')">Decline</button><button class="btn bs" style="flex:2" onclick="dg('navigating')">Accept Ride</button></div></div>`;cl();setTimeout(()=>{I.rq=setInterval(()=>{S.d.ti--;const c=document.getElementById('tC'),t=document.getElementById('tT');if(c)c.style.strokeDashoffset=283-(S.d.ti/15)*283;if(t)t.textContent=S.d.ti+'s';if(S.d.ti<=0){clearInterval(I.rq);S.d.on=true;dg('home')}},1000)},100)}
+else if(s.s==='navigating'){h+=`<div style="background:linear-gradient(135deg,var(--pri),var(--cyan));border-radius:var(--r);padding:22px;margin-bottom:16px;text-align:center"><div style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:4px;font-weight:600;letter-spacing:.5px">NAVIGATE TO PICKUP</div><div style="font-size:26px;font-weight:800;font-family:'Outfit'">Connaught Place</div><div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:6px">3 min · 1.2 km away</div></div>${mp(220,"Connaught Place","Hauz Khas",true,20)}<div class="card" style="margin-top:12px"><div class="fx" style="gap:12px"><div class="av" style="width:42px;height:42px">${ic('usr',18)}</div><div style="flex:1"><div style="font-weight:600">Ananya Sharma</div><div style="color:var(--gr);font-size:12px;margin-top:2px">Rider · ${ic('star',11)} 4.9</div></div><button style="width:40px;height:40px;border-radius:50%;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.12);cursor:pointer;color:var(--ok);display:flex;align-items:center;justify-content:center">${ic('ph',16)}</button><button style="width:40px;height:40px;border-radius:50%;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.12);cursor:pointer;color:var(--cyan);display:flex;align-items:center;justify-content:center">${ic('msg',16)}</button></div></div><button class="btn bs" style="margin-top:12px" onclick="S.d.pr=0;dg('trip')">Start Trip — Rider Picked Up</button>`}
+else if(s.s==='trip'){h+=`<div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:var(--r);padding:18px;margin-bottom:16px;text-align:center"><div style="color:var(--cyan);font-size:11px;margin-bottom:4px;font-weight:700;letter-spacing:.5px">TRIP IN PROGRESS</div><div style="font-size:22px;font-weight:800;font-family:'Outfit'">Hauz Khas Village</div><div class="prg" style="margin-top:12px"><div class="prg-bar" id="tf" style="width:${s.pr}%;background:linear-gradient(90deg,var(--cyan),var(--ok))"></div></div><div style="color:var(--gr);font-size:11px;margin-top:8px" id="tt">${s.pr}% · ${Math.max(1,Math.round((100-s.pr)/12))} min left</div></div>${mp(190,"CP","Hauz Khas",true,s.pr)}<div class="g3" style="margin-top:12px"><div class="card" style="text-align:center;margin:0"><div style="color:var(--cyan);font-size:18px;font-weight:800;font-family:'Outfit'">₹285</div><div style="color:var(--gr);font-size:10px;font-weight:600;margin-top:3px">FARE</div></div><div class="card" style="text-align:center;margin:0"><div style="font-size:18px;font-weight:800;font-family:'Outfit'">9.3 km</div><div style="color:var(--gr);font-size:10px;font-weight:600;margin-top:3px">DISTANCE</div></div><div class="card" style="text-align:center;margin:0"><div style="color:var(--ok);font-size:18px;font-weight:800;font-family:'Outfit'">₹228</div><div style="color:var(--gr);font-size:10px;font-weight:600;margin-top:3px">EARNING</div></div></div>`;cl();setTimeout(()=>{I.tp=setInterval(()=>{S.d.pr+=3;if(S.d.pr>=100){clearInterval(I.tp);dg('complete');return}const f=document.getElementById('tf'),t=document.getElementById('tt'),d=document.getElementById('dP');if(f)f.style.width=S.d.pr+'%';if(t)t.textContent=S.d.pr+'% · '+Math.max(1,Math.round((100-S.d.pr)/12))+' min left';if(d){d.style.left=(20+S.d.pr*.5)+'%';d.style.top=(55-S.d.pr*.2)+'%'}},400)},100)}
+else if(s.s==='complete'){h+=`<div style="text-align:center;padding:24px 0"><div style="width:80px;height:80px;border-radius:50%;margin:0 auto 24px;background:linear-gradient(135deg,var(--ok),#00C853);display:flex;align-items:center;justify-content:center;color:#fff">${ic('chk',36)}</div><h2 style="font-family:'Outfit';font-size:22px;margin-bottom:8px">Trip Complete</h2><div class="card" style="border-radius:20px;padding:28px;margin:24px 0;border-color:rgba(0,230,118,.08)"><div style="font-size:12px;color:var(--gr);margin-bottom:4px;font-weight:600;letter-spacing:.5px">YOU EARNED</div><div style="font-size:40px;font-weight:900;color:var(--ok);font-family:'Outfit'">₹228</div><div style="font-size:12px;color:var(--gr);margin-top:6px">Total fare: ₹285 · Commission: 20%</div><div class="fx" style="justify-content:space-around;margin-top:20px;padding-top:20px;border-top:1px solid rgba(107,117,153,.06)"><div><div style="font-weight:700">9.3 km</div><div style="color:var(--gr);font-size:10px;font-weight:600;margin-top:2px">DISTANCE</div></div><div><div style="font-weight:700">14 min</div><div style="color:var(--gr);font-size:10px;font-weight:600;margin-top:2px">DURATION</div></div><div><div>${st(5,12)}</div><div style="color:var(--gr);font-size:10px;font-weight:600;margin-top:2px">RATING</div></div></div></div><button class="btn bc" onclick="S.d.on=true;dg('home')">Continue Driving</button></div>`}
+c.innerHTML=h}
+
+// ADMIN
+const AT=[{i:"overview",c:"act",l:"Overview"},{i:"rides",c:"car",l:"Rides"},{i:"drivers",c:"usrs",l:"Drivers"},{i:"pricing",c:"dlr",l:"Pricing"},{i:"reports",c:"bar",l:"Reports"}];
+function ag(t){S.a.t=t;S.a.sd=null;ra()}
+function ra(){document.getElementById('aT').innerHTML=AT.map(t=>`<button class="tab ${S.a.t===t.i?'a':''}" onclick="ag('${t.i}')">${ic(t.c,14)} ${t.l}</button>`).join('');const c=document.getElementById('aC'),s=S.a;let h='';
+if(s.t==='overview'){h=`<div class="g2" style="margin-bottom:16px">${sc(ic('car',15),"Today's Rides",'463','var(--cyan)',12)}${sc(ic('dlr',15),'Revenue','₹68.4K','var(--ok)',8)}${sc(ic('usrs',15),'Active Drivers','127','#7B61FF',-3)}${sc(ic('usr',15),'Active Riders','2,847','var(--warn)',15)}</div><div class="card"><div style="font-family:'Outfit';font-weight:700;margin-bottom:14px">Weekly Revenue</div><canvas id="c1" height="180"></canvas></div><div class="card"><div style="font-family:'Outfit';font-weight:700;margin-bottom:14px">Ride Distribution</div><div class="fx"><div style="width:45%"><canvas id="c2" height="140"></canvas></div><div style="flex:1">${[{n:"Bike",v:35,c:"#00E5FF"},{n:"Mini",v:30,c:"#0A1AFF"},{n:"Sedan",v:25,c:"#7B61FF"},{n:"SUV",v:10,c:"#FF6B6B"}].map(v=>`<div class="fx" style="gap:8px;margin-bottom:8px"><div style="width:10px;height:10px;border-radius:3px;background:${v.c}"></div><span style="color:var(--grl);font-size:12px;flex:1">${v.n}</span><span style="font-size:12px;font-weight:700">${v.v}%</span></div>`).join('')}</div></div></div><div class="card"><div class="fxb" style="margin-bottom:12px"><span style="font-family:'Outfit';font-weight:700">Live Rides</span>${bg('online').replace('Online','23 Active')}</div>${mp(150)}</div>`;setTimeout(()=>{const a=document.getElementById('c1');if(a)new Chart(a,{type:'line',data:{labels:RV.l,datasets:[{data:RV.r,borderColor:'#00E5FF',backgroundColor:'rgba(0,229,255,.06)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#00E5FF',borderWidth:2}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#6B7599',font:{size:11,family:'DM Sans'}},grid:{display:false}},y:{ticks:{color:'#6B7599',font:{size:10}},grid:{color:'rgba(0,229,255,.03)'}}}}});const b=document.getElementById('c2');if(b)new Chart(b,{type:'doughnut',data:{labels:['Bike','Mini','Sedan','SUV'],datasets:[{data:[35,30,25,10],backgroundColor:['#00E5FF','#0A1AFF','#7B61FF','#FF6B6B'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{display:false}},cutout:'60%'}})},50)}
+else if(s.t==='rides'){h=`<div class="fx" style="gap:8px;margin-bottom:14px">${["all","completed","in_progress","cancelled"].map(f=>`<button class="fb ${f==='all'?'a':''}">${f==='all'?'All':f.replace('_',' ')}</button>`).join('')}</div>${RI.map(r=>`<div class="card"><div class="fxb" style="margin-bottom:12px"><span style="color:var(--cyan);font-size:12px;font-weight:700;letter-spacing:.5px">${r.id}</span>${bg(r.st)}</div><div class="fx" style="gap:8px;margin-bottom:6px"><div style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></div><span style="color:var(--grl);font-size:12px">${r.f}</span></div><div class="fx" style="gap:8px;margin-bottom:12px"><div style="width:8px;height:8px;border-radius:50%;border:2px solid var(--err)"></div><span style="color:var(--grl);font-size:12px">${r.t}</span></div><div class="fxb" style="padding-top:12px;border-top:1px solid rgba(107,117,153,.04);font-size:11px;color:var(--gr)"><span>${r.rr}</span><span>${r.dr||'—'}</span><span>${r.vh} · ${r.ds}</span><span style="color:var(--ok);font-weight:700">₹${r.fa}</span></div></div>`).join('')}`}
+else if(s.t==='drivers'){if(s.sd){const d=s.sd;h=`<button style="display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--cyan);cursor:pointer;margin-bottom:16px;font-size:13px;font-weight:600" onclick="S.a.sd=null;ra()">${ic('al',14)} Back</button><div class="card" style="padding:24px"><div class="fx" style="gap:14px;margin-bottom:20px"><div class="av" style="width:56px;height:56px">${ic('usr',24)}</div><div style="flex:1"><div style="font-family:'Outfit';font-weight:800;font-size:18px">${d.n}</div><div style="color:var(--gr);font-size:12px;margin-top:2px">${d.ph}</div></div>${bg(d.st)}</div><div class="g2" style="margin-bottom:16px"><div style="background:var(--card2);border-radius:12px;padding:14px"><div style="color:var(--gr);font-size:11px;font-weight:600;letter-spacing:.3px">RATING</div><div style="color:var(--warn);font-size:20px;font-weight:800;margin-top:6px;font-family:'Outfit'">${d.rt}</div></div><div style="background:var(--card2);border-radius:12px;padding:14px"><div style="color:var(--gr);font-size:11px;font-weight:600;letter-spacing:.3px">TOTAL RIDES</div><div style="font-size:20px;font-weight:800;margin-top:6px;font-family:'Outfit'">${d.ri}</div></div><div style="background:var(--card2);border-radius:12px;padding:14px"><div style="color:var(--gr);font-size:11px;font-weight:600;letter-spacing:.3px">EARNINGS</div><div style="color:var(--ok);font-size:20px;font-weight:800;margin-top:6px;font-family:'Outfit'">₹${d.ea.toLocaleString()}</div></div><div style="background:var(--card2);border-radius:12px;padding:14px"><div style="color:var(--gr);font-size:11px;font-weight:600;letter-spacing:.3px">VEHICLE</div><div style="font-size:14px;font-weight:700;margin-top:6px">${d.v}</div><div style="color:var(--gr);font-size:11px;margin-top:2px">${d.pl}</div></div></div><div class="fx" style="gap:8px"><button class="bsm" style="flex:1;background:${d.vr?'rgba(0,230,118,.06)':'rgba(255,214,0,.06)'};border:1px solid ${d.vr?'rgba(0,230,118,.12)':'rgba(255,214,0,.12)'};color:${d.vr?'var(--ok)':'var(--warn)'}">${d.vr?'Verified':'Verify Driver'}</button><button class="bsm" style="flex:1;background:rgba(255,61,87,.06);border:1px solid rgba(255,61,87,.12);color:var(--err)">Block Driver</button></div></div>`}else{h=`<div class="fxb" style="margin-bottom:14px"><span style="font-family:'Outfit';font-weight:700;font-size:16px">All Drivers (${DR.length})</span></div>`;DR.forEach(d=>{h+=`<button class="dc" onclick='S.a.sd=${JSON.stringify(d).replace(/'/g,"\\'")};ra()'><div class="av" style="width:42px;height:42px">${ic('usr',16)}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${d.n}</div><div style="color:var(--gr);font-size:11px;margin-top:2px">${d.v} · ${d.rt} · ${d.ri} rides</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">${bg(d.st)}${!d.vr?bg('pending'):''}</div></button>`})}}
+else if(s.t==='pricing'){const p=s.p;h=`<h3 style="font-family:'Outfit';font-size:18px;font-weight:800;margin-bottom:16px">Pricing Rules</h3><div class="card">${[{l:"Base Fare",k:"ba",u:"₹",mn:10,mx:100},{l:"Per Kilometer",k:"km",u:"₹/km",mn:5,mx:50},{l:"Per Minute",k:"mn",u:"₹/min",mn:1,mx:10}].map(i=>`<div style="margin-bottom:20px"><div class="fxb" style="margin-bottom:8px"><span style="color:var(--grl);font-size:13px">${i.l}</span><span style="color:var(--cyan);font-weight:800;font-size:16px;font-family:'Outfit'">${i.u==='₹'?'₹':''}${p[i.k]}${i.u!=='₹'?' '+i.u:''}</span></div><div class="fx" style="gap:10px"><button class="bi" style="width:32px;height:32px" onclick="S.a.p.${i.k}=Math.max(${i.mn},S.a.p.${i.k}-1);ra()">${ic('min',14)}</button><div style="flex:1;height:5px;background:var(--card2);border-radius:3px;overflow:hidden"><div style="height:100%;width:${((p[i.k]-i.mn)/(i.mx-i.mn))*100}%;background:linear-gradient(90deg,var(--pri),var(--cyan));border-radius:3px"></div></div><button class="bi" style="width:32px;height:32px" onclick="S.a.p.${i.k}=Math.min(${i.mx},S.a.p.${i.k}+1);ra()">${ic('pls',14)}</button></div></div>`).join('')}</div><div class="card" style="border-color:rgba(255,214,0,.08)"><div class="fx" style="gap:8px;margin-bottom:14px"><span style="color:var(--warn)">${ic('zap',16)}</span><span style="font-weight:700">Surge Pricing</span></div><div class="fx" style="gap:8px">${[1.0,1.25,1.5,1.75,2.0].map(v=>`<button class="sb ${p.su===v?'a':''}" onclick="S.a.p.su=${v};ra()">${v}x</button>`).join('')}</div></div><div class="card"><div style="font-weight:700;margin-bottom:14px;font-family:'Outfit'">Fare Preview (10 km, 20 min)</div><div class="g2">${V.map(v=>{const e=Math.round((p.ba+p.km*10+p.mn*20)*p.su*(v.r/12));return`<div style="background:var(--card2);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px"><div class="vi" style="width:40px;height:40px;font-size:11px">${v.n.substring(0,2).toUpperCase()}</div><div><div style="font-size:12px;font-weight:600">${v.n}</div><div style="color:var(--cyan);font-size:16px;font-weight:800;font-family:'Outfit'">₹${e}</div></div></div>`}).join('')}</div></div>`}
+else if(s.t==='reports'){h=`<h3 style="font-family:'Outfit';font-size:18px;font-weight:800;margin-bottom:16px">Analytics</h3><div class="card"><div style="font-family:'Outfit';font-weight:700;margin-bottom:12px">Rides by Hour</div><canvas id="c3" height="160"></canvas></div><div class="card"><div style="font-family:'Outfit';font-weight:700;margin-bottom:12px">Revenue vs Rides</div><canvas id="c4" height="160"></canvas><div class="fx" style="justify-content:center;gap:24px;margin-top:8px"><div class="fx" style="gap:8px"><div style="width:14px;height:3px;background:var(--cyan);border-radius:2px"></div><span style="color:var(--gr);font-size:11px">Revenue</span></div><div class="fx" style="gap:8px"><div style="width:14px;height:3px;background:var(--warn);border-radius:2px"></div><span style="color:var(--gr);font-size:11px">Rides</span></div></div></div><div class="g2">${sc(ic('trd',14),'Avg Fare','₹247','var(--cyan)')}${sc(ic('clk',14),'Avg Duration','18 min','var(--warn)')}${sc(ic('star',14),'Avg Rating','4.6','var(--warn)')}${sc(ic('xc',14),'Cancel Rate','8.2%','var(--err)')}</div>`;setTimeout(()=>{const hd=Array.from({length:24},(_,i)=>Math.floor(Math.random()*60)+(i>=8&&i<=10?40:i>=17&&i<=20?50:10));const a=document.getElementById('c3');if(a)new Chart(a,{type:'bar',data:{labels:Array.from({length:24},(_,i)=>i+':00'),datasets:[{data:hd,backgroundColor:'rgba(0,229,255,.6)',borderRadius:4,hoverBackgroundColor:'var(--cyan)'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#6B7599',font:{size:9,family:'DM Sans'},maxTicksLimit:8},grid:{display:false}},y:{ticks:{color:'#6B7599',font:{size:10}},grid:{color:'rgba(0,229,255,.03)'}}}}});const b=document.getElementById('c4');if(b)new Chart(b,{type:'line',data:{labels:RV.l,datasets:[{data:RV.r,borderColor:'#00E5FF',backgroundColor:'transparent',tension:.4,pointRadius:3,pointBackgroundColor:'#00E5FF',borderWidth:2,yAxisID:'y'},{data:RV.d,borderColor:'#FFD600',backgroundColor:'transparent',tension:.4,pointRadius:3,pointBackgroundColor:'#FFD600',borderWidth:2,yAxisID:'y1'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#6B7599',font:{size:11}},grid:{display:false}},y:{position:'left',ticks:{color:'#6B7599',font:{size:10}},grid:{color:'rgba(0,229,255,.03)'}},y1:{position:'right',ticks:{color:'#6B7599',font:{size:10}},grid:{display:false}}}}})},50)}
+c.innerHTML=h}
 </script>
 </body>
 </html>
